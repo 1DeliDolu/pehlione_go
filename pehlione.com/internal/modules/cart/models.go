@@ -5,6 +5,7 @@ import "time"
 type Cart struct {
 	ID        string  `gorm:"type:char(36);primaryKey"`
 	UserID    *string `gorm:"type:char(36);index:ix_carts_user_id"`
+	Status    string  `gorm:"type:varchar(32);not null;default:open"`
 	Items     []CartItem
 	CreatedAt time.Time `gorm:"type:datetime(3);not null"`
 	UpdatedAt time.Time `gorm:"type:datetime(3);not null"`

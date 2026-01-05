@@ -57,11 +57,33 @@ func (c *Codec) GetCartID(ctx *gin.Context) (string, bool) {
 	return id, true
 }
 
-func (c *Codec) Set(ctx *gin.Context, cartID string) {
-	val := c.Encode(cartID)
+// Get retrieves Cart from cookie (for guest cart items)
+func (c *Codec) Get(ctx *gin.Context) (*Cart, error) {
+	v, err := ctx.Cookie(c.CookieName)
+	if err != nil || v == "" {
+		return &Cart{}, nil
+	}
+	// Try to decode as JSON cart
+	cartJSON, _ := base64.RawURLEncoding.DecodeString(v)
+	if len(cartJSON) > 0 {
+		cc := FromJSON(string(cartJSON))
+		if cc != nil {
+			return cc, nil
+		}
+	}
+	return &Cart{}, nil
+}
+
+// Set stores Cart in cookie (for guest cart items)
+func (c *Codec) Set(ctx *gin.Context, cart *Cart) {
+	if cart == nil {
+		cart = &Cart{}
+	}
+	jsonStr := cart.ToJSON()
+	encoded := base64.RawURLEncoding.EncodeToString([]byte(jsonStr))
 	maxAge := int((30 * 24 * time.Hour).Seconds())
 	ctx.SetSameSite(2) // Lax
-	ctx.SetCookie(c.CookieName, val, maxAge, "/", "", c.Secure, true)
+	ctx.SetCookie(c.CookieName, encoded, maxAge, "/", "", c.Secure, true)
 }
 
 func (c *Codec) Clear(ctx *gin.Context) {

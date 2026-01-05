@@ -1,0 +1,46 @@
+package cartcookie
+
+import (
+	"encoding/json"
+)
+
+type Item struct {
+	VariantID string `json:"variant_id"`
+	Qty       int    `json:"qty"`
+}
+
+type Cart struct {
+	Items []Item `json:"items"`
+}
+
+// AddItem ekler veya quantity'yi artırır
+func (c *Cart) AddItem(variantID string, qty int) {
+	if c == nil || qty < 1 {
+		return
+	}
+	for i := range c.Items {
+		if c.Items[i].VariantID == variantID {
+			c.Items[i].Qty += qty
+			return
+		}
+	}
+	c.Items = append(c.Items, Item{VariantID: variantID, Qty: qty})
+}
+
+// ToJSON serializes cart
+func (c *Cart) ToJSON() string {
+	if c == nil {
+		c = &Cart{}
+	}
+	b, _ := json.Marshal(c)
+	return string(b)
+}
+
+// FromJSON deserializes cart
+func FromJSON(s string) *Cart {
+	var c Cart
+	if err := json.Unmarshal([]byte(s), &c); err != nil {
+		return &Cart{}
+	}
+	return &c
+}

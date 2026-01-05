@@ -63,7 +63,46 @@ func ProductsBody(h view.HeaderCtx) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-7xl mx-auto px-4\"><h1 class=\"text-3xl font-semibold mb-6\">Products</h1><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\"><!-- Sample Product 1 --><div class=\"border rounded-lg p-4 cursor-pointer\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 1</h2><p class=\"text-gray-600 mb-2\">A high-quality product for your needs.</p><p class=\"text-2xl font-bold mb-4\">$19.99</p><!-- Add to cart button with HTMX POST --><form hx-post=\"/api/cart/add\" hx-target=\"#cart-badge\" hx-swap=\"outerHTML\" class=\"w-full\"><input type=\"hidden\" name=\"product_id\" value=\"prod_001\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_001\"> <input type=\"hidden\" name=\"quantity\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer\">Add to Cart</button></form></div><!-- Sample Product 2 --><div class=\"border rounded-lg p-4 cursor-pointer\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 2</h2><p class=\"text-gray-600 mb-2\">Premium quality with great features.</p><p class=\"text-2xl font-bold mb-4\">$29.99</p><form hx-post=\"/api/cart/add\" hx-target=\"#cart-badge\" hx-swap=\"outerHTML\" class=\"w-full\"><input type=\"hidden\" name=\"product_id\" value=\"prod_002\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_002\"> <input type=\"hidden\" name=\"quantity\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer\">Add to Cart</button></form></div><!-- Sample Product 3 --><div class=\"border rounded-lg p-4 cursor-pointer\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 3</h2><p class=\"text-gray-600 mb-2\">Exclusive offer with limited quantity.</p><p class=\"text-2xl font-bold mb-4\">$39.99</p><form hx-post=\"/api/cart/add\" hx-target=\"#cart-badge\" hx-swap=\"outerHTML\" class=\"w-full\"><input type=\"hidden\" name=\"product_id\" value=\"prod_003\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_003\"> <input type=\"hidden\" name=\"quantity\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer\">Add to Cart</button></form></div></div><div class=\"mt-8 p-4 bg-gray-100 rounded\"><h3 class=\"font-semibold mb-2\">How it works:</h3><ul class=\"text-sm text-gray-700 space-y-1\"><li>✓ Click \"Add to Cart\" button</li><li>✓ Form POSTs to /api/cart/add with product_id, variant_id, quantity</li><li>✓ Item is persisted to database (users only)</li><li>✓ Cart badge updates via HTMX (no page reload)</li><li>✓ Session cache is cleared for fresh count</li></ul></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-7xl mx-auto px-4\"><h1 class=\"text-3xl font-semibold mb-6\">Products</h1><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\"><!-- Sample Product 1 --><div class=\"border rounded-lg p-4\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 1</h2><p class=\"text-gray-600 mb-2\">A high-quality product for your needs.</p><p class=\"text-2xl font-bold mb-4\">$19.99</p><!-- SSR Form: Add to cart --><form method=\"post\" action=\"/cart/add\" class=\"w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 25, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_001\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer font-semibold\">Sepete Ekle</button></form></div><!-- Sample Product 2 --><div class=\"border rounded-lg p-4\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 2</h2><p class=\"text-gray-600 mb-2\">Premium quality with great features.</p><p class=\"text-2xl font-bold mb-4\">$29.99</p><form method=\"post\" action=\"/cart/add\" class=\"w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 44, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_002\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer font-semibold\">Sepete Ekle</button></form></div><!-- Sample Product 3 --><div class=\"border rounded-lg p-4\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 3</h2><p class=\"text-gray-600 mb-2\">Exclusive offer with limited quantity.</p><p class=\"text-2xl font-bold mb-4\">$39.99</p><form method=\"post\" action=\"/cart/add\" class=\"w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 63, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_003\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer font-semibold\">Sepete Ekle</button></form></div></div><div class=\"mt-8 p-4 bg-gray-100 rounded\"><h3 class=\"font-semibold mb-2\">How it works:</h3><ul class=\"text-sm text-gray-700 space-y-1\"><li>✓ Click \"Add to Cart\" button</li><li>✓ Form POSTs to /api/cart/add with product_id, variant_id, quantity</li><li>✓ Item is persisted to database (users only)</li><li>✓ Cart badge updates via HTMX (no page reload)</li><li>✓ Session cache is cleared for fresh count</li></ul></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"pehlione.com/app/internal/http/middleware"
+	"pehlione.com/app/pkg/view"
 	"pehlione.com/app/templates/pages"
 )
 
@@ -20,5 +21,8 @@ func Component(c *gin.Context, status int, component templ.Component) {
 
 func Home(c *gin.Context) {
 	flash := middleware.GetFlash(c)
-	Component(c, http.StatusOK, pages.Home(flash))
+	h := view.HeaderCtx{
+		CSRFToken: middleware.GetCSRFToken(c),
+	}
+	Component(c, http.StatusOK, pages.Home(flash, h))
 }

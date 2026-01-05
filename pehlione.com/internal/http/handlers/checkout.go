@@ -3,10 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"pehlione.com/app/internal/http/cartcookie"
@@ -42,7 +44,7 @@ type checkoutInput struct {
 	Address2   string `form:"address2" binding:"omitempty,max=255"`
 	City       string `form:"city" binding:"required,min=2,max=100"`
 	PostalCode string `form:"postal_code" binding:"required,min=2,max=32"`
-	Country    string `form:"country" binding:"required,min=2,max=2"`
+	Country    string `form:"country" binding:"required,len=2"`
 	Phone      string `form:"phone" binding:"required,min=5,max=32"`
 
 	ShippingMethod string `form:"shipping_method" binding:"required,oneof=standard express"`
@@ -63,14 +65,9 @@ type addressJSON struct {
 func (h *CheckoutHandler) Get(c *gin.Context) {
 	u, authed := middleware.CurrentUser(c)
 
-	cartID, ok := h.resolveCartID(c)
-	if !ok {
-		render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Sepet boş.")
-		return
-	}
-
-	summary, itemsCount, currency, err := h.cartSummary(c, cartID)
+	summary, itemsCount, currency, err := h.buildCartSummary(c)
 	if err != nil {
+		log.Printf("Checkout GET: buildCartSummary failed for user %v: %v", u.ID, err)
 		middleware.Fail(c, apperr.Wrap(err))
 		return
 	}
@@ -104,13 +101,7 @@ func (h *CheckoutHandler) Get(c *gin.Context) {
 func (h *CheckoutHandler) Post(c *gin.Context) {
 	u, authed := middleware.CurrentUser(c)
 
-	cartID, ok := h.resolveCartID(c)
-	if !ok {
-		render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Sepet boş.")
-		return
-	}
-
-	summary, itemsCount, currency, err := h.cartSummary(c, cartID)
+	summary, itemsCount, currency, err := h.buildCartSummary(c)
 	if err != nil {
 		middleware.Fail(c, apperr.Wrap(err))
 		return
@@ -153,11 +144,35 @@ func (h *CheckoutHandler) Post(c *gin.Context) {
 
 	var userID *string
 	var guestEmail *string
+	var cartID string
+
 	if authed {
 		userID = &u.ID
+		// Get user cart ID
+		crt, err := cartmod.NewRepo(h.DB).GetOrCreateUserCart(c.Request.Context(), u.ID)
+		if err != nil {
+			middleware.Fail(c, apperr.Wrap(err))
+			return
+		}
+		cartID = crt.ID
 	} else {
 		em := strings.ToLower(strings.TrimSpace(in.Email))
 		guestEmail = &em
+
+		// Guest: create temporary cart from cookie
+		cc, _ := h.CartCK.Get(c)
+		if cc == nil || len(cc.Items) == 0 {
+			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Sepet boş.")
+			return
+		}
+
+		// Create temp cart in DB for order creation
+		tempCart, err := h.createTempCartFromCookie(c, cc)
+		if err != nil {
+			middleware.Fail(c, apperr.Wrap(err))
+			return
+		}
+		cartID = tempCart.ID
 	}
 
 	idem := strings.TrimSpace(in.IdemKey)
@@ -168,6 +183,8 @@ func (h *CheckoutHandler) Post(c *gin.Context) {
 	if !authed {
 		idemKey = nil
 	}
+
+	log.Printf("Creating order: cartID=%s, userID=%v, guestEmail=%v, shipCents=%d", cartID, userID, guestEmail, shipCents)
 
 	res, err := h.OrderSv.CreateFromCart(c.Request.Context(), orders.CreateFromCartInput{
 		CartID:              cartID,
@@ -183,13 +200,26 @@ func (h *CheckoutHandler) Post(c *gin.Context) {
 	if err != nil {
 		var oos *checkout.OutOfStockError
 		if errors.As(err, &oos) {
+			log.Printf("Checkout failed: out of stock - %v", err)
 			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Bazı ürünler stokta yok. Lütfen sepeti güncelleyin.")
 			return
 		}
 		if errors.Is(err, orders.ErrCartEmpty) {
+			log.Printf("Checkout failed: cart empty")
 			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Sepet boş.")
 			return
 		}
+		if errors.Is(err, orders.ErrProductUnavailable) {
+			log.Printf("Checkout failed: product unavailable")
+			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Bazı ürünler mevcut değil.")
+			return
+		}
+		if errors.Is(err, orders.ErrCurrencyMismatch) {
+			log.Printf("Checkout failed: currency mismatch")
+			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Para birimi uyuşmazlığı.")
+			return
+		}
+		log.Printf("Checkout error (unhandled): %T - %v", err, err)
 		h.renderCheckoutWithErrors(c, authed, summary, currency, nil, "Checkout başarısız. Lütfen tekrar deneyin.", in)
 		return
 	}
@@ -206,47 +236,62 @@ func (h *CheckoutHandler) Post(c *gin.Context) {
 
 // --- helpers ---
 
-func (h *CheckoutHandler) resolveCartID(c *gin.Context) (string, bool) {
-	if u, ok := middleware.CurrentUser(c); ok {
-		crt, err := cartmod.NewRepo(h.DB).GetOrCreateUserCart(c.Request.Context(), u.ID)
-		if err == nil {
-			return crt.ID, true
-		}
-	}
-	if id, ok := h.CartCK.GetCartID(c); ok {
-		return id, true
-	}
-	return "", false
-}
+func (h *CheckoutHandler) buildCartSummary(c *gin.Context) (view.CheckoutSummary, int, string, error) {
+	svc := cartmod.NewService(h.DB)
 
-func (h *CheckoutHandler) cartSummary(c *gin.Context, cartID string) (view.CheckoutSummary, int, string, error) {
-	repo := cartmod.NewRepo(h.DB)
-	crt, err := repo.GetCart(c.Request.Context(), cartID)
+	var cartPage view.CartPage
+	var err error
+
+	if u, ok := middleware.CurrentUser(c); ok {
+		// Logged-in user
+		cartPage, err = svc.BuildCartPageForUser(c.Request.Context(), u.ID)
+	} else {
+		// Guest user
+		cc, _ := h.CartCK.Get(c)
+		cartPage, err = svc.BuildCartPageFromCookie(c.Request.Context(), cc)
+	}
+
 	if err != nil {
 		return view.CheckoutSummary{}, 0, "EUR", err
 	}
 
-	subtotalCents := 0
-	items := 0
-	cur := "EUR"
-
-	for _, it := range crt.Items {
-		v := it.Variant
-		cur = v.Currency
-		items += it.Quantity
-		subtotalCents += v.PriceCents * it.Quantity
-	}
-
 	ship := shippingCents("standard")
-	total := subtotalCents + ship
+	total := cartPage.SubtotalCents + ship
 
 	return view.CheckoutSummary{
-		Currency: cur,
-		Subtotal: view.MoneyFromCents(subtotalCents, cur),
-		Shipping: view.MoneyFromCents(ship, cur),
-		Total:    view.MoneyFromCents(total, cur),
-		Items:    items,
-	}, items, cur, nil
+		Currency: cartPage.Currency,
+		Subtotal: cartPage.Subtotal,
+		Shipping: view.MoneyFromCents(ship, cartPage.Currency),
+		Total:    view.MoneyFromCents(total, cartPage.Currency),
+		Items:    cartPage.Count,
+	}, cartPage.Count, cartPage.Currency, nil
+}
+
+func (h *CheckoutHandler) createTempCartFromCookie(c *gin.Context, cc *cartcookie.Cart) (*cartmod.Cart, error) {
+	repo := cartmod.NewRepo(h.DB)
+
+	// Create empty cart with UUID
+	tempCart := cartmod.Cart{
+		ID:     uuid.NewString(),
+		UserID: nil,
+	}
+	if err := h.DB.Create(&tempCart).Error; err != nil {
+		log.Printf("createTempCartFromCookie: failed to create cart: %v", err)
+		return nil, err
+	}
+
+	// Add items from cookie
+	for _, it := range cc.Items {
+		if it.VariantID == "" || it.Qty <= 0 {
+			continue
+		}
+		if err := repo.AddItem(c.Request.Context(), tempCart.ID, it.VariantID, it.Qty); err != nil {
+			log.Printf("createTempCartFromCookie: failed to add item %s: %v", it.VariantID, err)
+			return nil, err
+		}
+	}
+
+	return &tempCart, nil
 }
 
 func (h *CheckoutHandler) renderCheckoutWithErrors(c *gin.Context, authed bool, summary view.CheckoutSummary, currency string, errs validation.FieldErrors, pageErr string, in checkoutInput) {

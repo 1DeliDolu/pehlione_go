@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/hex"
+	"log"
 	"net/http"
 	"strings"
 
@@ -35,6 +36,7 @@ func CSRF(cfg CSRFCfg) gin.HandlerFunc {
 		token, err := c.Cookie(cfg.CookieName)
 		if err != nil || token == "" {
 			token = generateCSRFToken()
+			c.SetSameSite(http.SameSiteLaxMode)
 			c.SetCookie(cfg.CookieName, token, 0, "/", "", cfg.Secure, false) // httpOnly=false so JS can read
 		}
 
@@ -54,6 +56,7 @@ func CSRF(cfg CSRFCfg) gin.HandlerFunc {
 		}
 
 		if subtle.ConstantTimeCompare([]byte(token), []byte(formToken)) != 1 {
+			log.Printf("CSRF validation failed: cookie token=%s, form token=%s, path=%s", token, formToken, c.Request.URL.Path)
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "invalid CSRF token"})
 			return
 		}

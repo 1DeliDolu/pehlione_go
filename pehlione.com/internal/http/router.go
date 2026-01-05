@@ -92,9 +92,13 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	productsH := handlers.NewProductsHandler()
 	r.GET("/products", productsH.List)
 
+	// Cart codec
+	cartCodec := cartcookie.New(secret, "pehlione_cart", false) // dev: secure=false
+
 	// Cart (public shopping cart page)
-	cartH := handlers.NewCartHandler()
+	cartH := handlers.NewCartHandler(db, flashCodec, cartCodec)
 	r.GET("/cart", cartH.Get)
+	r.POST("/cart/add", cartH.Add) // SSR: add to cart + redirect
 
 	// Company (public company info page)
 	companyH := handlers.NewCompanyHandler()

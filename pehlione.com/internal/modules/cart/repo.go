@@ -2,6 +2,7 @@ package cart
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -12,8 +13,18 @@ type Repo struct{ db *gorm.DB }
 func NewRepo(db *gorm.DB) *Repo { return &Repo{db: db} }
 
 func (r *Repo) GetOrCreateUserCart(ctx context.Context, userID string) (Cart, error) {
+	if userID == "" {
+		return Cart{}, errors.New("userID cannot be empty")
+	}
 	var c Cart
-	err := r.db.WithContext(ctx).FirstOrCreate(&c, Cart{UserID: &userID}).Error
+	err := r.db.WithContext(ctx).
+		Where(Cart{UserID: &userID}).
+		Assign(Cart{Status: "open"}).
+		FirstOrCreate(&c, Cart{
+			ID:     uuid.NewString(),
+			UserID: &userID,
+			Status: "open",
+		}).Error
 	return c, err
 }
 
@@ -27,6 +38,26 @@ func (r *Repo) GetCart(ctx context.Context, cartID string) (Cart, error) {
 }
 
 func (r *Repo) AddItem(ctx context.Context, cartID string, variantID string, qty int) error {
+	// Check if item already exists
+	var existing CartItem
+	err := r.db.WithContext(ctx).
+		Where("cart_id = ? AND variant_id = ?", cartID, variantID).
+		First(&existing).Error
+
+	if err == nil {
+		// Item exists, increment quantity
+		newQty := existing.Quantity + qty
+		return r.db.WithContext(ctx).
+			Model(&CartItem{}).
+			Where("cart_id = ? AND variant_id = ?", cartID, variantID).
+			Update("quantity", newQty).Error
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err // Real error, not just missing record
+	}
+
+	// Item doesn't exist, create new
 	item := CartItem{
 		ID:        uuid.NewString(),
 		CartID:    cartID,

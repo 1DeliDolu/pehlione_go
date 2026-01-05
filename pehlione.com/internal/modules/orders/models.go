@@ -25,9 +25,9 @@ type Order struct {
 	BillingAddressJSON  datatypes.JSON `gorm:"type:json"`
 
 	IdempotencyKey *string    `gorm:"type:varchar(64);index"`
-	PaidAt         *time.Time `gorm:"type:datetime(3)"`
-	RefundedCents  int        `gorm:"not null;default:0"`
-	RefundedAt     *time.Time `gorm:"type:datetime(3)"`
+	PaidAt         *time.Time `gorm:"-"` // TODO: add to database via migration
+	RefundedCents  int        `gorm:"-"` // TODO: add to database via migration
+	RefundedAt     *time.Time `gorm:"-"` // TODO: add to database via migration
 
 	CreatedAt time.Time `gorm:"type:datetime(3);not null"`
 	UpdatedAt time.Time `gorm:"type:datetime(3);not null"`

@@ -56,6 +56,7 @@ func (h *CartAddHandler) AddItem(c *gin.Context) {
 		// For now, just return success with badge component
 		middleware.ClearSessionCartCache(c)
 		headerCtx := middleware.BuildHeaderCtx(c)
+		c.Header("HX-Trigger", `{"showToast": {"message": "✓ Ürün sepete eklendi! (Giriş yapın)", "type": "success"}}`)
 		render.Component(c, http.StatusOK, components.CartBadge(headerCtx))
 		return
 	}
@@ -79,5 +80,7 @@ func (h *CartAddHandler) AddItem(c *gin.Context) {
 	headerCtx := middleware.BuildHeaderCtx(c)
 
 	// Return updated badge component for HTMX to swap
+	// Also trigger a success notification
+	c.Header("HX-Trigger", `{"showToast": {"message": "✓ Ürün sepete eklendi!", "type": "success"}}`)
 	render.Component(c, http.StatusOK, components.CartBadge(headerCtx))
 }
