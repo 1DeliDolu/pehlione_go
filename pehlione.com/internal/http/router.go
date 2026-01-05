@@ -110,7 +110,7 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	})
 
 	// Auth (DB-backed): signup/login/logout
-	authH := handlers.NewAuthHandlers(db, flashCodec, sessCfg)
+	authH := handlers.NewAuthHandlers(db, flashCodec, sessCfg, cartCK)
 	r.GET("/signup", authH.SignupGet)
 	r.POST("/signup", authH.SignupPost)
 	r.GET("/login", authH.LoginGet)

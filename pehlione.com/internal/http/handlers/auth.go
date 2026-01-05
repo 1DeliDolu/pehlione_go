@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -8,11 +9,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
+	"pehlione.com/app/internal/http/cartcookie"
 	"pehlione.com/app/internal/http/flash"
 	"pehlione.com/app/internal/http/middleware"
 	"pehlione.com/app/internal/http/render"
 	"pehlione.com/app/internal/http/validation"
 	"pehlione.com/app/internal/modules/auth"
+	cartmod "pehlione.com/app/internal/modules/cart"
 	"pehlione.com/app/pkg/view"
 	"pehlione.com/app/templates/pages"
 )
@@ -52,15 +55,17 @@ type AuthHandlers struct {
 	flash   *flash.Codec
 	sessCfg middleware.SessionCfg
 	repo    *auth.Repo
+	cartCK  *cartcookie.Codec
 }
 
 // NewAuthHandlers creates a new AuthHandlers instance.
-func NewAuthHandlers(db *gorm.DB, flashCodec *flash.Codec, sessCfg middleware.SessionCfg) *AuthHandlers {
+func NewAuthHandlers(db *gorm.DB, flashCodec *flash.Codec, sessCfg middleware.SessionCfg, cartCK *cartcookie.Codec) *AuthHandlers {
 	return &AuthHandlers{
 		db:      db,
 		flash:   flashCodec,
 		sessCfg: sessCfg,
 		repo:    auth.NewRepo(db),
+		cartCK:  cartCK,
 	}
 }
 
@@ -204,6 +209,11 @@ func (h *AuthHandlers) LoginPost(c *gin.Context) {
 	// Set session cookie
 	c.SetCookie(h.sessCfg.CookieName, sess.ID, int(h.sessCfg.TTL.Seconds()), "/", "", h.sessCfg.Secure, true)
 
+	// Merge guest cart to user cart
+	if cc, _ := h.cartCK.Get(c); cc != nil && len(cc.Items) > 0 {
+		h.mergeGuestCart(c, user.ID, cc)
+	}
+
 	// Redirect to return_to or home
 	dest := "/"
 	if returnTo != "" {
@@ -223,4 +233,33 @@ func (h *AuthHandlers) LogoutPost(c *gin.Context) {
 	c.SetCookie(h.sessCfg.CookieName, "", -1, "/", "", h.sessCfg.Secure, true)
 
 	render.RedirectWithFlash(c, h.flash, "/", view.FlashInfo, "Çıkış yapıldı.")
+}
+
+// mergeGuestCart merges guest cart items into user's DB cart
+func (h *AuthHandlers) mergeGuestCart(c *gin.Context, userID string, cc *cartcookie.Cart) {
+	repo := cartmod.NewRepo(h.db)
+
+	// Get or create user cart
+	userCart, err := repo.GetOrCreateUserCart(c.Request.Context(), userID)
+	if err != nil {
+		log.Printf("mergeGuestCart: failed to get user cart: %v", err)
+		return
+	}
+
+	// Add each cookie item to DB cart
+	for _, item := range cc.Items {
+		if item.VariantID == "" || item.Qty <= 0 {
+			continue
+		}
+		if err := repo.AddItem(c.Request.Context(), userCart.ID, item.VariantID, item.Qty); err != nil {
+			log.Printf("mergeGuestCart: failed to add item %s: %v", item.VariantID, err)
+			// Continue with other items even if one fails
+		}
+	}
+
+	// Clear guest cart cookie
+	h.cartCK.Clear(c)
+
+	// Clear session cart cache
+	middleware.ClearSessionCartCache(c)
 }

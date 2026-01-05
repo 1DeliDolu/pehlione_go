@@ -18,13 +18,15 @@ func (r *Repo) GetOrCreateUserCart(ctx context.Context, userID string) (Cart, er
 	}
 	var c Cart
 	err := r.db.WithContext(ctx).
-		Where(Cart{UserID: &userID}).
-		Assign(Cart{Status: "open"}).
-		FirstOrCreate(&c, Cart{
+		Where("user_id = ?", userID).
+		Attrs(Cart{
 			ID:     uuid.NewString(),
-			UserID: &userID,
 			Status: "open",
-		}).Error
+		}).
+		FirstOrCreate(&c).Error
+
+	// Set UserID after FirstOrCreate (needed for create case)
+	c.UserID = &userID
 	return c, err
 }
 
