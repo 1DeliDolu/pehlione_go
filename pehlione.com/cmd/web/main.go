@@ -10,6 +10,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	"pehlione.com/app/internal/config"
 	apphttp "pehlione.com/app/internal/http"
 )
 
@@ -21,17 +22,16 @@ func main() {
 		Level: slog.LevelInfo,
 	}))
 
-	// Database connection
-	dsn := os.Getenv("DB_DSN")
-	if dsn == "" {
-		log.Fatal("DB_DSN environment variable is required")
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
 	}
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(cfg.DBDSN), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	r := apphttp.NewRouter(logger, db)
+	r := apphttp.NewRouter(logger, db, cfg)
 	_ = r.Run(":8080")
 }

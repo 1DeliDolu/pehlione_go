@@ -1,0 +1,5 @@
+{{define "content"}}
+Order {{.OrderID}} refund processed.
+Refund total: {{.Total}}
+Details: {{trackURL .OrderURL "order_refunded"}}
+{{end}}

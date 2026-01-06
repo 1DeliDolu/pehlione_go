@@ -1,0 +1,11 @@
+{{define "content"}}
+  <p style="font-size:15px;color:#475569;margin:0 0 16px;">Your order is on the way. Track it online for the most recent updates.</p>
+  <div style="margin:20px 0;padding:20px;border:1px solid #e2e8f0;border-radius:16px;">
+    <p style="margin:0;font-size:14px;color:#1e293b;"><strong>Order ID:</strong> {{.OrderID}}</p>
+    <p style="margin:4px 0 0;font-size:14px;color:#1e293b;"><strong>Status:</strong> {{.StatusLabel}}</p>
+  </div>
+  <p style="text-align:center;margin:24px 0;">
+    <a href="{{trackURL .OrderURL "order_shipped"}}" style="display:inline-block;background:#0ea5e9;color:#ffffff;padding:14px 32px;border-radius:999px;font-weight:600;text-decoration:none;">Track order</a>
+  </p>
+  <p style="font-size:13px;color:#94a3b8;">We&rsquo;ll notify you once it&rsquo;s delivered.</p>
+{{end}}

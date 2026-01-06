@@ -17,6 +17,91 @@ templ AdminOrderDetailBody(csrf string, o view.AdminOrderDetail) {
 		</div>
 
 		<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+			<h2 class="mb-4 text-xl font-semibold text-white">Kargolar</h2>
+			if len(o.Shipments) == 0 {
+				<p class="text-sm text-slate-300">Henüz kargo oluşturulmadı.</p>
+			} else {
+				<div class="space-y-4">
+					for _, s := range o.Shipments {
+						<div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+							<div class="flex items-center justify-between">
+								<p class="font-semibold text-white">{ s.Carrier }</p>
+								<span class="rounded-full border border-white/10 px-3 py-0.5 text-xs uppercase text-amber-200">{ s.Status }</span>
+							</div>
+							if s.Note != "" {
+								<p class="mt-1 text-xs text-slate-400">{ s.Note }</p>
+							}
+							<div class="mt-2 text-xs text-slate-400">
+								if s.TrackingNumber != "" {
+									<p>Tracking: 
+										if s.TrackingURL != "" {
+											<a class="underline" href={ s.TrackingURL } target="_blank" rel="noreferrer">{ s.TrackingNumber }</a>
+										} else {
+											<span>{ s.TrackingNumber }</span>
+										}
+									</p>
+								}
+								if s.ShippedAt != "" {
+									<p>Shipped: { s.ShippedAt }</p>
+								}
+								if s.DeliveredAt != "" {
+									<p>Delivered: { s.DeliveredAt }</p>
+								}
+							</div>
+							<div class="mt-2 flex flex-wrap gap-3 text-xs">
+								if s.LabelURL != "" {
+									<a class="rounded-full border border-white/10 px-3 py-1 hover:border-amber-300" target="_blank" rel="noreferrer" href={ s.LabelURL }>Label indir</a>
+								}
+								if s.Error != "" {
+									<span class="text-red-300">Hata: { s.Error }</span>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			}
+			if o.ShippingAvailable {
+				<div class="mt-6 grid gap-4 md:grid-cols-2">
+					<form method="post" action={ "/admin/orders/" + o.ID + "/shipments/label" } class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white">
+						<input type="hidden" name="csrf_token" value={ csrf }/>
+						<h3 class="mb-2 font-semibold text-white">Etiket oluştur</h3>
+						<label class="mb-1 block text-xs text-slate-400">Kargo firması</label>
+						<input class="mb-3 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="carrier" placeholder="Örn. mock-express"/>
+						<label class="mb-1 block text-xs text-slate-400">Servis (opsiyonel)</label>
+						<input class="mb-3 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="service" placeholder="Örn. standard"/>
+						<label class="mb-1 block text-xs text-slate-400">Not (opsiyonel)</label>
+						<textarea class="mb-3 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="note" rows="2" placeholder="Not"></textarea>
+						<label class="mb-2 inline-flex items-center gap-2 text-xs text-slate-300">
+							<input type="checkbox" name="confirm" value="1" class="rounded border-white/20 bg-transparent"/>
+							Onaylıyorum
+						</label>
+						<button class="inline-flex rounded-full border border-white/10 px-4 py-2 text-xs font-semibold hover:border-amber-300" type="submit">Etiketi kuyruğa al</button>
+					</form>
+					<form method="post" action={ "/admin/orders/" + o.ID + "/shipments/manual" } class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white">
+						<input type="hidden" name="csrf_token" value={ csrf }/>
+						<h3 class="mb-2 font-semibold text-white">Manuel kargo</h3>
+						<label class="mb-1 block text-xs text-slate-400">Kargo firması</label>
+						<input class="mb-3 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="carrier" placeholder="Örn. Yurtiçi Kargo"/>
+						<label class="mb-1 block text-xs text-slate-400">Takip numarası</label>
+						<input class="mb-3 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="tracking_no" placeholder="TRK123456"/>
+						<label class="mb-1 block text-xs text-slate-400">Takip linki (opsiyonel)</label>
+						<input class="mb-3 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="tracking_url" placeholder="https://..."/>
+						<label class="mb-1 block text-xs text-slate-400">Not (opsiyonel)</label>
+						<textarea class="mb-3 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="note" rows="2" placeholder="Not"></textarea>
+						<label class="mb-2 inline-flex items-center gap-2 text-xs text-slate-300">
+							<input type="checkbox" name="confirm" value="1" class="rounded border-white/20 bg-transparent"/>
+							Onaylıyorum
+						</label>
+						<button class="inline-flex rounded-full border border-white/10 px-4 py-2 text-xs font-semibold hover:border-amber-300" type="submit">Kargoyu kaydet</button>
+					</form>
+				</div>
+				<p class="mt-3 text-xs text-slate-400">Etiket işlemleri sağlayıcı API'si ile asenkron yürütülür. Hatalar otomatik yeniden denenecektir.</p>
+			} else {
+				<p class="mt-3 text-xs text-slate-400">Kargo entegrasyonu yapılandırılmadı.</p>
+			}
+		</div>
+
+		<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
 			<h1 class="text-3xl font-bold text-white">Sipariş Özeti</h1>
 			<div class="mt-4 grid gap-4 md:grid-cols-2">
 				<div class="rounded-2xl border border-white/10 bg-white/5 p-4">

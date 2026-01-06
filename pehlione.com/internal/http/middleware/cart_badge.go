@@ -30,16 +30,18 @@ func CartBadge(cfg CartBadgeCfg) gin.HandlerFunc {
 		preview := view.CartPage{}
 		previewSet := false
 
+		displayCurrency := GetDisplayCurrency(c)
+
 		if cfg.CartSvc != nil {
 			if u, ok := CurrentUser(c); ok {
-				if page, err := cfg.CartSvc.BuildCartPageForUser(c, u.ID); err == nil {
+				if page, err := cfg.CartSvc.BuildCartPageForUser(c.Request.Context(), u.ID, displayCurrency); err == nil {
 					preview = page
 					previewSet = true
 					qty = page.Count
 				}
 			} else if cfg.CartCookie != nil {
 				if cc, err := cfg.CartCookie.Get(c); err == nil && cc != nil {
-					if page, err := cfg.CartSvc.BuildCartPageFromCookie(c, cc); err == nil {
+					if page, err := cfg.CartSvc.BuildCartPageFromCookie(c.Request.Context(), cc, displayCurrency); err == nil {
 						preview = page
 						previewSet = true
 						qty = page.Count

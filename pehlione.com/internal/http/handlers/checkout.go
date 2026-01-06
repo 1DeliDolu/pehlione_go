@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -14,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"pehlione.com/app/internal/emails"
 	"pehlione.com/app/internal/http/cartcookie"
 	"pehlione.com/app/internal/http/flash"
 	"pehlione.com/app/internal/http/middleware"
@@ -21,6 +20,7 @@ import (
 	"pehlione.com/app/internal/http/validation"
 	cartmod "pehlione.com/app/internal/modules/cart"
 	"pehlione.com/app/internal/modules/checkout"
+	"pehlione.com/app/internal/modules/currency"
 	emailmod "pehlione.com/app/internal/modules/email"
 	"pehlione.com/app/internal/modules/orders"
 	"pehlione.com/app/internal/shared/apperr"
@@ -29,16 +29,27 @@ import (
 )
 
 type CheckoutHandler struct {
-	DB      *gorm.DB
-	Flash   *flash.Codec
-	CartCK  *cartcookie.Codec
-	OrderSv *orders.Service
-	EmailSv *emailmod.OutboxService
-	BaseURL string
+	DB          *gorm.DB
+	Flash       *flash.Codec
+	CartCK      *cartcookie.Codec
+	CartSvc     *cartmod.Service
+	OrderSv     *orders.Service
+	EmailSv     *emailmod.OutboxService
+	CurrencySvc *currency.Service
+	BaseURL     string
 }
 
-func NewCheckoutHandler(db *gorm.DB, fl *flash.Codec, ck *cartcookie.Codec, osvc *orders.Service, emailSvc *emailmod.OutboxService, baseURL string) *CheckoutHandler {
-	return &CheckoutHandler{DB: db, Flash: fl, CartCK: ck, OrderSv: osvc, EmailSv: emailSvc, BaseURL: baseURL}
+func NewCheckoutHandler(db *gorm.DB, fl *flash.Codec, ck *cartcookie.Codec, cartSvc *cartmod.Service, osvc *orders.Service, emailSvc *emailmod.OutboxService, currSvc *currency.Service, baseURL string) *CheckoutHandler {
+	return &CheckoutHandler{
+		DB:          db,
+		Flash:       fl,
+		CartCK:      ck,
+		CartSvc:     cartSvc,
+		OrderSv:     osvc,
+		EmailSv:     emailSvc,
+		CurrencySvc: currSvc,
+		BaseURL:     baseURL,
+	}
 }
 
 type checkoutInput struct {
@@ -94,7 +105,7 @@ func (h *CheckoutHandler) Get(c *gin.Context) {
 		form.Email = u.Email
 	}
 
-	opts := shippingOptions(currency)
+	opts := shippingOptions(c.Request.Context(), h.CurrencySvc, currency)
 	payments := paymentOptions()
 	render.Component(c, http.StatusOK, pages.Checkout(
 		middleware.GetFlash(c),
@@ -203,6 +214,11 @@ func (h *CheckoutHandler) Post(c *gin.Context) {
 
 	log.Printf("Creating order: cartID=%s, userID=%v, guestEmail=%v, shipCents=%d", cartID, userID, guestEmail, shipCents)
 
+	chargeCurrency := currency
+	if h.CurrencySvc != nil {
+		chargeCurrency = h.CurrencySvc.ChooseChargeCurrency(currency)
+	}
+
 	res, err := h.OrderSv.CreateFromCart(c.Request.Context(), orders.CreateFromCartInput{
 		CartID:              cartID,
 		UserID:              userID,
@@ -213,6 +229,8 @@ func (h *CheckoutHandler) Post(c *gin.Context) {
 		DiscountCents:       0,
 		ShippingAddressJSON: addrBytes,
 		BillingAddressJSON:  nil,
+		DisplayCurrency:     currency,
+		ChargeCurrency:      chargeCurrency,
 	})
 	if err != nil {
 		var oos *checkout.OutOfStockError
@@ -264,37 +282,54 @@ func (h *CheckoutHandler) Post(c *gin.Context) {
 // --- helpers ---
 
 func (h *CheckoutHandler) buildCartSummary(c *gin.Context) (view.CheckoutSummary, int, string, error) {
-	svc := cartmod.NewService(h.DB)
-
+	svc := h.CartSvc
+	if svc == nil {
+		svc = cartmod.NewService(h.DB, h.CurrencySvc)
+	}
+	displayCurrency := middleware.GetDisplayCurrency(c)
 	var cartPage view.CartPage
 	var err error
 
 	if u, ok := middleware.CurrentUser(c); ok {
 		// Logged-in user
-		cartPage, err = svc.BuildCartPageForUser(c.Request.Context(), u.ID)
+		cartPage, err = svc.BuildCartPageForUser(c.Request.Context(), u.ID, displayCurrency)
 	} else {
 		// Guest user
 		cc, _ := h.CartCK.Get(c)
-		cartPage, err = svc.BuildCartPageFromCookie(c.Request.Context(), cc)
+		cartPage, err = svc.BuildCartPageFromCookie(c.Request.Context(), cc, displayCurrency)
 	}
 
 	if err != nil {
-		return view.CheckoutSummary{}, 0, "EUR", err
+		return view.CheckoutSummary{}, 0, displayCurrency, err
 	}
 
 	ship := shippingCents("standard")
-	total := cartPage.SubtotalCents + ship
+	shipDisplay := ship
+	if h.CurrencySvc != nil {
+		if converted, _, convErr := h.CurrencySvc.ConvertDisplay(c.Request.Context(), ship, cartPage.Currency); convErr == nil {
+			shipDisplay = converted
+		}
+	}
+	displayTotal := cartPage.DisplayTotalCents + shipDisplay
+	totalBase := cartPage.BaseSubtotalCents + ship
 
 	return view.CheckoutSummary{
-		Currency:      cartPage.Currency,
-		Subtotal:      cartPage.Subtotal,
-		Shipping:      view.MoneyFromCents(ship, cartPage.Currency),
-		Total:         view.MoneyFromCents(total, cartPage.Currency),
-		Items:         cartPage.Count,
-		Lines:         cartPage.Items,
-		SubtotalCents: cartPage.SubtotalCents,
-		ShippingCents: ship,
-		TotalCents:    total,
+		Currency:             cartPage.Currency,
+		BaseCurrency:         cartPage.BaseCurrency,
+		Subtotal:             cartPage.Subtotal,
+		Shipping:             view.MoneyFromCents(shipDisplay, cartPage.Currency),
+		Total:                view.MoneyFromCents(displayTotal, cartPage.Currency),
+		Items:                cartPage.Count,
+		Lines:                cartPage.Items,
+		SubtotalCents:        cartPage.BaseSubtotalCents,
+		ShippingCents:        ship,
+		TotalCents:           totalBase,
+		BaseSubtotalCents:    cartPage.BaseSubtotalCents,
+		BaseShippingCents:    ship,
+		BaseTotalCents:       totalBase,
+		DisplaySubtotalCents: cartPage.DisplaySubtotalCents,
+		DisplayShippingCents: shipDisplay,
+		DisplayTotalCents:    displayTotal,
 	}, cartPage.Count, cartPage.Currency, nil
 }
 
@@ -351,12 +386,22 @@ func (h *CheckoutHandler) renderCheckoutWithErrors(c *gin.Context, authed bool, 
 	}
 
 	ship := shippingCents(form.ShippingMethod)
-	summary.Shipping = view.MoneyFromCents(ship, currency)
+	shipDisplay := ship
+	if h.CurrencySvc != nil {
+		if converted, _, err := h.CurrencySvc.ConvertDisplay(c.Request.Context(), ship, currency); err == nil {
+			shipDisplay = converted
+		}
+	}
+	summary.Shipping = view.MoneyFromCents(shipDisplay, currency)
 	summary.ShippingCents = ship
+	summary.BaseShippingCents = ship
+	summary.DisplayShippingCents = shipDisplay
 	summary.TotalCents = summary.SubtotalCents + ship
-	summary.Total = view.MoneyFromCents(summary.TotalCents, currency)
+	displayTotal := summary.DisplaySubtotalCents + shipDisplay
+	summary.DisplayTotalCents = displayTotal
+	summary.Total = view.MoneyFromCents(displayTotal, currency)
 
-	opts := shippingOptions(currency)
+	opts := shippingOptions(c.Request.Context(), h.CurrencySvc, currency)
 	payments := paymentOptions()
 
 	render.Component(c, http.StatusBadRequest, pages.Checkout(
@@ -372,11 +417,21 @@ func (h *CheckoutHandler) renderCheckoutWithErrors(c *gin.Context, authed bool, 
 	))
 }
 
-func shippingOptions(currency string) []view.ShippingOption {
+func shippingOptions(ctx context.Context, currSvc *currency.Service, currency string) []view.ShippingOption {
 	return []view.ShippingOption{
-		{Code: "standard", Label: "Standard (2-4 gün)", Price: view.MoneyFromCents(shippingCents("standard"), currency)},
-		{Code: "express", Label: "Express (1-2 gün)", Price: view.MoneyFromCents(shippingCents("express"), currency)},
+		{Code: "standard", Label: "Standard (2-4 gün)", Price: formatShippingPrice(ctx, currSvc, shippingCents("standard"), currency)},
+		{Code: "express", Label: "Express (1-2 gün)", Price: formatShippingPrice(ctx, currSvc, shippingCents("express"), currency)},
 	}
+}
+
+func formatShippingPrice(ctx context.Context, currSvc *currency.Service, base int, currency string) string {
+	amount := base
+	if currSvc != nil {
+		if converted, _, err := currSvc.ConvertDisplay(ctx, base, currency); err == nil {
+			amount = converted
+		}
+	}
+	return view.MoneyFromCents(amount, currency)
 }
 
 func shippingCents(method string) int {
@@ -423,114 +478,14 @@ func (h *CheckoutHandler) sendOrderConfirmation(ctx context.Context, emailAddr s
 		addr.PaymentMethod = paymentMethod
 	}
 
-	addressLines := formatAddressLines(addr)
-	pdfURL := strings.TrimRight(h.BaseURL, "/") + "/orders/" + orderID + "/invoice.pdf"
+	payload := emails.BuildOrderPayload(h.BaseURL, order, items, "Paid", "")
+	payload["PreviewText"] = "Payment received - here are your order details."
 
-	subject := fmt.Sprintf("Siparişiniz alındı (#%s)", orderID)
-	htmlBody := buildConfirmationHTML(order, items, addr, addressLines, pdfURL)
-	textBody := buildConfirmationText(order, items, addr, addressLines, pdfURL)
-
-	if err := h.EmailSv.Enqueue(ctx, to, subject, textBody, htmlBody); err != nil {
+	if err := h.EmailSv.Enqueue(ctx, emailmod.Job{
+		To:       to,
+		Template: emailmod.TemplateOrderPaid,
+		Payload:  payload,
+	}); err != nil {
 		log.Printf("checkout: failed to enqueue confirmation email: %v", err)
 	}
-}
-
-func formatAddressLines(addr addressJSON) []string {
-	var lines []string
-	fullName := strings.TrimSpace(strings.TrimSpace(addr.FirstName) + " " + strings.TrimSpace(addr.LastName))
-	if fullName != "" {
-		lines = append(lines, fullName)
-	}
-	if addr.Address1 != "" {
-		lines = append(lines, addr.Address1)
-	}
-	if addr.Address2 != "" {
-		lines = append(lines, addr.Address2)
-	}
-	cityLine := strings.TrimSpace(strings.TrimSpace(addr.PostalCode) + " " + addr.City)
-	if cityLine != "" {
-		lines = append(lines, cityLine)
-	}
-	if addr.Country != "" {
-		lines = append(lines, strings.ToUpper(addr.Country))
-	}
-	if addr.Phone != "" {
-		lines = append(lines, "Tel: "+addr.Phone)
-	}
-	return lines
-}
-
-func buildConfirmationHTML(order orders.Order, items []orders.OrderItem, addr addressJSON, addressLines []string, pdfURL string) string {
-	brandYellow := "#FACC15"
-	brandOrange := "#F97316"
-	var sb strings.Builder
-	sb.WriteString(`<div style="background-color:#f8fafc;padding:24px;font-family:'Inter','Segoe UI',Arial,sans-serif;">`)
-	sb.WriteString(`<div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:16px;padding:32px;box-shadow:0 12px 24px rgba(15,23,42,0.08);">`)
-	sb.WriteString(`<div style="text-align:center;margin-bottom:24px;">`)
-	sb.WriteString(`<span style="font-size:28px;font-weight:700;letter-spacing:1px;color:` + brandYellow + `">pehli</span>`)
-	sb.WriteString(`<span style="font-size:28px;font-weight:700;letter-spacing:1px;color:` + brandOrange + `">ONE</span>`)
-	sb.WriteString(`</div>`)
-	sb.WriteString(`<p style="font-size:16px;color:#0f172a;margin-bottom:8px;">Merhaba,</p>`)
-	sb.WriteString(`<p style="font-size:15px;color:#475569;margin-bottom:24px;">Siparişiniz başarıyla alındı. Detaylar aşağıdadır.</p>`)
-	sb.WriteString(`<div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:24px;">`)
-	sb.WriteString(`<p style="margin:0;font-size:14px;color:#475569;"><strong>Sipariş No:</strong> ` + html.EscapeString(order.ID) + `</p>`)
-	sb.WriteString(`<p style="margin:4px 0;font-size:14px;color:#475569;"><strong>Ödeme:</strong> ` + html.EscapeString(view.PaymentMethodLabel(addr.PaymentMethod)) + `</p>`)
-	sb.WriteString(`<p style="margin:4px 0;font-size:14px;color:#475569;"><strong>Teslimat:</strong> ` + html.EscapeString(view.ShippingLabel(addr.ShippingMethod)) + `</p>`)
-	if len(addressLines) > 0 {
-		sb.WriteString(`<p style="margin:8px 0 0;font-size:14px;color:#475569;"><strong>Adres:</strong><br/>` + html.EscapeString(strings.Join(addressLines, ", ")) + `</p>`)
-	}
-	sb.WriteString(`</div>`)
-
-	sb.WriteString(`<table style="width:100%;border-collapse:collapse;font-size:14px;color:#0f172a;">`)
-	sb.WriteString(`<thead><tr style="background:#f8fafc;">`)
-	sb.WriteString(`<th style="padding:8px;border:1px solid #e2e8f0;text-align:left;">Ürün</th>`)
-	sb.WriteString(`<th style="padding:8px;border:1px solid #e2e8f0;text-align:center;">Adet</th>`)
-	sb.WriteString(`<th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">Tutar</th>`)
-	sb.WriteString(`</tr></thead><tbody>`)
-	for _, it := range items {
-		sb.WriteString(`<tr>`)
-		sb.WriteString(`<td style="padding:8px;border:1px solid #e2e8f0;">` + html.EscapeString(it.ProductName) + `</td>`)
-		sb.WriteString(fmt.Sprintf(`<td style="padding:8px;border:1px solid #e2e8f0;text-align:center;">%d</td>`, it.Quantity))
-		sb.WriteString(`<td style="padding:8px;border:1px solid #e2e8f0;text-align:right;">` + view.MoneyFromCents(it.LineTotalCents, it.Currency) + `</td>`)
-		sb.WriteString(`</tr>`)
-	}
-	sb.WriteString(`</tbody></table>`)
-
-	sb.WriteString(`<div style="margin-top:24px;border-top:1px solid #e2e8f0;padding-top:16px;">`)
-	sb.WriteString(`<p style="display:flex;justify-content:space-between;font-size:14px;margin:4px 0;color:#475569;"><span>Ara Toplam</span><strong>` + view.MoneyFromCents(order.SubtotalCents, order.Currency) + `</strong></p>`)
-	sb.WriteString(`<p style="display:flex;justify-content:space-between;font-size:14px;margin:4px 0;color:#475569;"><span>Kargo</span><strong>` + view.MoneyFromCents(order.ShippingCents, order.Currency) + `</strong></p>`)
-	sb.WriteString(`<p style="display:flex;justify-content:space-between;font-size:16px;margin:8px 0;color:#0f172a;"><span>Toplam</span><strong>` + view.MoneyFromCents(order.TotalCents, order.Currency) + `</strong></p>`)
-	sb.WriteString(`</div>`)
-
-	sb.WriteString(`<div style="margin-top:24px;text-align:center;">`)
-	sb.WriteString(`<a href="` + html.EscapeString(pdfURL) + `" style="display:inline-flex;align-items:center;gap:8px;background:` + brandOrange + `;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:600;">PDF Fatura İndir</a>`)
-	sb.WriteString(`</div>`)
-	sb.WriteString(`<p style="font-size:13px;color:#94a3b8;margin-top:24px;text-align:center;">pehliONE · Bu e-posta bilgilendirme amaçlıdır.</p>`)
-	sb.WriteString(`</div></div>`)
-	return sb.String()
-}
-
-func buildConfirmationText(order orders.Order, items []orders.OrderItem, addr addressJSON, addressLines []string, pdfURL string) string {
-	var sb strings.Builder
-	sb.WriteString("pehliONE Sipariş Onayı\n")
-	sb.WriteString("--------------------------------\n")
-	sb.WriteString(fmt.Sprintf("Sipariş No: %s\n", order.ID))
-	sb.WriteString(fmt.Sprintf("Ödeme: %s\n", view.PaymentMethodLabel(addr.PaymentMethod)))
-	sb.WriteString(fmt.Sprintf("Teslimat: %s\n", view.ShippingLabel(addr.ShippingMethod)))
-	if len(addressLines) > 0 {
-		sb.WriteString("Adres:\n")
-		for _, line := range addressLines {
-			sb.WriteString("  " + line + "\n")
-		}
-	}
-	sb.WriteString("\nÜrünler:\n")
-	for _, it := range items {
-		sb.WriteString(fmt.Sprintf("- %s x%d: %s\n", it.ProductName, it.Quantity, view.MoneyFromCents(it.LineTotalCents, it.Currency)))
-	}
-	sb.WriteString("\nAra Toplam: " + view.MoneyFromCents(order.SubtotalCents, order.Currency) + "\n")
-	sb.WriteString("Kargo: " + view.MoneyFromCents(order.ShippingCents, order.Currency) + "\n")
-	sb.WriteString("Toplam: " + view.MoneyFromCents(order.TotalCents, order.Currency) + "\n")
-	sb.WriteString("\nPDF fatura: " + pdfURL + "\n")
-	sb.WriteString("\nTeşekkürler,\npehliONE\n")
-	return sb.String()
 }

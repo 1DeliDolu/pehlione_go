@@ -1,0 +1,29 @@
+package layout
+
+import (
+	"pehlione.com/app/pkg/view"
+	"pehlione.com/app/templates/components"
+)
+
+templ AdminBase(title string, flash *view.Flash, body templ.Component) {
+	<!doctype html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title } - Admin - pehlione.com</title>
+			<link rel="stylesheet" href="/static/css/app.css"/>
+			<!-- HTMX for AJAX functionality -->
+			<script src="https://unpkg.com/htmx.org@2.0.0"></script>
+		</head>
+		<body class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900 antialiased">
+			@AdminHeader()
+			<div class="mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+				@components.FlashBanner(flash)
+				@body
+			</div>
+			<!-- TailwindPlus Elements for el-popover, el-dialog, el-disclosure -->
+			<script type="module" src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"></script>
+		</body>
+	</html>
+}

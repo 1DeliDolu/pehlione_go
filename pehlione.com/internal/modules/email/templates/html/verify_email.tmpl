@@ -1,0 +1,8 @@
+{{define "content"}}
+  <p style="font-size:15px;color:#475569;margin-bottom:20px;">Thanks for creating an account. Confirm your email address to unlock your profile.</p>
+  <p style="text-align:center;margin:24px 0;">
+    <a href="{{trackURL .VerifyURL "verify_email"}}" style="display:inline-block;background:#f59e0b;color:#0f172a;padding:14px 32px;border-radius:999px;font-weight:600;text-decoration:none;">Verify email</a>
+  </p>
+  <p style="font-size:13px;color:#94a3b8;">If the button does not work, copy and paste this link into your browser:</p>
+  <p style="font-size:13px;color:#3b82f6;word-break:break-all;">{{trackURL .VerifyURL "verify_email"}}</p>
+{{end}}

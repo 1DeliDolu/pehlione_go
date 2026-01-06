@@ -53,6 +53,29 @@ templ OrderDetailBody(o view.OrderDetail) {
 		<div class="mt-2"><strong>Total:</strong> { o.Total }</div>
 	</div>
 
+	if len(o.Shipments) > 0 {
+		<div class="mt-4 rounded border p-3">
+			<h2 class="mb-2 text-lg font-semibold">Shipments</h2>
+			<ul class="space-y-2 text-sm">
+				for _, s := range o.Shipments {
+					<li class="border-b border-gray-200 pb-2 last:border-b-0 last:pb-0">
+						<div><strong>Carrier:</strong> { s.Carrier }</div>
+						<div><strong>Status:</strong> { s.Status }</div>
+						if s.TrackingNumber != "" {
+							<div><strong>Tracking:</strong>
+								if s.TrackingURL != "" {
+									<a class="underline" target="_blank" rel="noreferrer" href={ s.TrackingURL }>{ s.TrackingNumber }</a>
+								} else {
+									<span>{ s.TrackingNumber }</span>
+								}
+							</div>
+						}
+					</li>
+				}
+			</ul>
+		</div>
+	}
+
 	if o.Status == "created" {
 		<div class="mt-3">
 			<a class="underline" href={ "/orders/" + o.ID + "/pay" }>Pay now</a>

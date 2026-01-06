@@ -8,6 +8,10 @@ package shared
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import (
+	"pehlione.com/app/templates/layout"
+)
+
 type BaseVM struct {
 	Title string
 }
@@ -40,13 +44,21 @@ func Base(vm BaseVM) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(vm.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/shared/base.templ`, Line: 13, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/shared/base.templ`, Line: 17, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"bg-white text-gray-900\"><!-- Header --><header class=\"border-b border-gray-200\"><div class=\"mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8\"><div class=\"flex items-center justify-between\"><a href=\"/\" class=\"text-lg font-semibold\"><span class=\"text-yellow-400\">Pehli</span><span class=\"text-orange-500\">ONE</span></a><nav class=\"flex items-center gap-4 text-sm\"><a href=\"/products\" class=\"text-gray-700 hover:text-gray-900\">Products</a> <a href=\"/cart\" class=\"text-gray-700 hover:text-gray-900\">Cart</a></nav></div></div></header><!-- Main --><main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"stylesheet\" href=\"/static/css/app.css\"></head><body class=\"bg-white text-gray-900 antialiased\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = layout.Header().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- Main --><main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -54,7 +66,7 @@ func Base(vm BaseVM) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main><!-- Footer --><footer class=\"border-t border-gray-200 py-12\"><div class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><p class=\"text-center text-sm text-gray-500\">© 2026 Pehlione. All rights reserved.</p></div></footer></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</main><!-- Footer --><footer class=\"border-t border-gray-200 py-12\"><div class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><p class=\"text-center text-sm text-gray-500\">© 2026 Pehlione. All rights reserved.</p></div></footer><!-- TailwindPlus Elements for el-popover, el-dialog, el-disclosure --><script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

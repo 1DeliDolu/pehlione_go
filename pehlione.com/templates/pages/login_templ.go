@@ -191,7 +191,7 @@ func LoginBody(csrfToken string, returnTo string, form view.LoginForm, errs vali
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<button class=\"rounded border px-4 py-2\" type=\"submit\">Sign in</button></form><div class=\"mt-6 border-t pt-6\"><p class=\"mb-3 text-sm text-gray-600\">Don&rsquo;t have an account?</p><a href=\"/signup\" class=\"inline-block rounded border px-4 py-2 font-semibold hover:bg-gray-50\">Create account</a></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<button class=\"rounded border px-4 py-2\" type=\"submit\">Sign in</button></form><div class=\"mt-4 rounded border p-3 text-sm\"><p class=\"font-medium\">Forgot your password?</p><p class=\"text-gray-600\">Email us at <a href=\"mailto:info@pehlione.com\" class=\"underline\">info@pehlione.com</a> and we'll help you reset it.</p></div><div class=\"mt-6 border-t pt-6\"><p class=\"mb-3 text-sm text-gray-600\">Don&rsquo;t have an account?</p><a href=\"/signup\" class=\"inline-block rounded border px-4 py-2 font-semibold hover:bg-gray-50\">Create account</a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

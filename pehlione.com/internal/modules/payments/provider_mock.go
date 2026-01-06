@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -20,14 +19,18 @@ var ErrInvalidSignature = errors.New("invalid webhook signature")
 var ErrTimestampOutOfRange = errors.New("webhook timestamp out of range")
 
 type MockProvider struct {
-	WebhookSecret []byte
+	WebhookSecret    []byte
+	ToleranceSeconds int
 }
 
-func NewMockProvider(secret string) MockProvider {
+func NewMockProvider(secret string, tolerance int) MockProvider {
 	if secret == "" {
 		secret = "dev_secret_change_me"
 	}
-	return MockProvider{WebhookSecret: []byte(secret)}
+	if tolerance <= 0 {
+		tolerance = 300
+	}
+	return MockProvider{WebhookSecret: []byte(secret), ToleranceSeconds: tolerance}
 }
 
 func (MockProvider) Name() string { return "mock" }
@@ -76,7 +79,10 @@ func (p MockProvider) VerifyAndParseWebhook(headers http.Header, body []byte) (W
 		return WebhookEvent{}, ErrInvalidSignature
 	}
 
-	tol := toleranceSeconds()
+	tol := p.ToleranceSeconds
+	if tol <= 0 {
+		tol = 300
+	}
 	now := time.Now().Unix()
 
 	// replay/clock-skew guard:
@@ -161,16 +167,4 @@ func computeSigHex(secret []byte, t int64, body []byte) string {
 	m.Write([]byte("."))
 	m.Write(body)
 	return hex.EncodeToString(m.Sum(nil))
-}
-
-func toleranceSeconds() int {
-	v := strings.TrimSpace(os.Getenv("MOCK_WEBHOOK_TOLERANCE_SECONDS"))
-	if v == "" {
-		return 300
-	}
-	n, err := strconv.Atoi(v)
-	if err != nil || n < 60 || n > 3600 {
-		return 300
-	}
-	return n
 }

@@ -63,33 +63,7 @@ func VerifyEmailBody(csrfToken string, returnTo string) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"min-h-screen bg-gradient-to-b from-slate-50 to-white\"><div class=\"mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8\"><div class=\"w-full overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-slate-200\"><div class=\"grid md:grid-cols-2\"><!-- Illustration / Modern visual (desktop) --><div class=\"relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 md:block\"><div class=\"absolute -left-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl\"></div><div class=\"absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-white/10 blur-3xl\"></div><div class=\"relative flex h-full flex-col justify-between p-10 text-white\"><div><p class=\"text-xs font-semibold uppercase tracking-[0.35em] text-white/80\">pehliONE</p><h2 class=\"mt-3 text-3xl font-bold tracking-tight\">Verify your email</h2><p class=\"mt-3 text-sm text-white/80\">Enter the 6-digit code we sent to your inbox to continue.</p></div><!-- Inline SVG illustration --><div class=\"mt-10\"><div class=\"relative mx-auto w-full max-w-sm rounded-2xl bg-white/10 p-6 ring-1 ring-white/15 backdrop-blur\"><svg viewBox=\"0 0 512 512\" aria-hidden=\"true\" class=\"h-28 w-28\"><defs><linearGradient id=\"mailGrad\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"white\" stop-opacity=\"0.95\"></stop> <stop offset=\"1\" stop-color=\"white\" stop-opacity=\"0.65\"></stop></linearGradient></defs> <path fill=\"url(#mailGrad)\" d=\"M64 128c0-17.7 14.3-32 32-32h320c17.7 0 32 14.3 32 32v256c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zm64 32v16l128 96 128-96v-16H128zm256 64-128 96-128-96v160h256V224z\"></path> <path fill=\"white\" fill-opacity=\"0.35\" d=\"M352 320c0 53-43 96-96 96s-96-43-96-96 43-96 96-96 96 43 96 96z\"></path> <path fill=\"white\" fill-opacity=\"0.85\" d=\"M256 248c-7.7 0-14 6.3-14 14v40.6l-18.3 18.3c-5.5 5.5-5.5 14.4 0 19.8 5.5 5.5 14.4 5.5 19.8 0l22.4-22.4c2.6-2.6 4.1-6.2 4.1-9.9V262c0-7.7-6.3-14-14-14z\"></path></svg><div class=\"mt-6 space-y-2\"><div class=\"h-2 w-full rounded-full bg-white/20\"></div><div class=\"h-2 w-5/6 rounded-full bg-white/20\"></div><div class=\"h-2 w-2/3 rounded-full bg-white/20\"></div></div><p class=\"mt-6 text-xs text-white/80\">Tip: Check your spam folder if you don&rsquo;t see the email.</p></div></div><p class=\"text-xs text-white/70\">Secure verification step</p></div></div><!-- Form --><div class=\"p-8 sm:p-10\"><div class=\"md:hidden\"><p class=\"text-xs font-semibold uppercase tracking-[0.35em] text-indigo-600\">pehliONE</p><h1 class=\"mt-3 text-2xl font-bold tracking-tight text-slate-900\">Verify your email</h1><p class=\"mt-2 text-sm text-slate-600\">Enter the 6-digit code we sent to your email address.</p></div><form method=\"post\" action=\"/verify\" class=\"mt-8 space-y-6\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(csrfToken)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/verify_email.templ`, Line: 73, Col: 63}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"> <input type=\"hidden\" name=\"return_to\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(returnTo)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/verify_email.templ`, Line: 74, Col: 61}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div><label for=\"code\" class=\"block text-sm font-semibold text-slate-900\">Verification code</label><p class=\"mt-1 text-sm text-slate-600\">Use the code from the email. It is valid for a short time.</p><div class=\"mt-3\"><input type=\"text\" id=\"code\" name=\"code\" placeholder=\"000000\" maxlength=\"6\" pattern=\"[0-9]{6}\" inputmode=\"numeric\" autocomplete=\"one-time-code\" class=\"w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center font-mono text-2xl tracking-widest text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20\" required></div></div><button type=\"submit\" class=\"w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2\">Verify</button><div class=\"pt-2 text-center\"><p class=\"text-sm text-slate-600\">Didn&rsquo;t receive a code? <a href=\"/signup\" class=\"font-semibold text-indigo-600 hover:text-indigo-700\">Try again</a></p></div></form><div class=\"mt-10 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-200\"><p class=\"font-semibold text-slate-900\">Having trouble?</p><p class=\"mt-1\">Make sure you entered all 6 digits, and check spam/junk folders if the email didn&rsquo;t arrive.</p></div></div></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"min-h-screen bg-gradient-to-b from-slate-50 to-white\"><div class=\"mx-auto flex min-h-screen max-w-4xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8\"><div class=\"w-full rounded-3xl bg-white p-10 shadow-xl ring-1 ring-slate-200\"><p class=\"text-xs font-semibold uppercase tracking-[0.35em] text-indigo-600\">pehliONE</p><h1 class=\"mt-3 text-3xl font-bold tracking-tight text-slate-900\">Check your inbox</h1><p class=\"mt-2 text-sm text-slate-600\">We sent a verification link to your email address. Click the button in the email to continue.</p><div class=\"mt-6 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-200\"><p class=\"font-semibold text-slate-900\">Didn&rsquo;t get the email?</p><ul class=\"mt-2 list-disc space-y-1 pl-5\"><li>Check your spam or junk folders.</li><li>Make sure you entered the correct email address.</li><li>Still no email? <a href=\"/signup\" class=\"font-semibold text-indigo-600 hover:text-indigo-700\">Try signing up again.</a></li></ul></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,0 +1,11 @@
+{{define "content"}}
+  <p style="font-size:15px;color:#475569;margin:0 0 16px;">Your package was delivered. We hope you enjoy it—here&rsquo;s a quick reference to revisit the order details.</p>
+  <div style="margin:20px 0;padding:20px;border:1px solid #e2e8f0;border-radius:16px;">
+    <p style="margin:0;font-size:14px;color:#1e293b;"><strong>Order ID:</strong> {{.OrderID}}</p>
+    <p style="margin:4px 0 0;font-size:14px;color:#1e293b;"><strong>Status:</strong> {{.StatusLabel}}</p>
+  </div>
+  <p style="text-align:center;margin:24px 0;">
+    <a href="{{trackURL .OrderURL "order_delivered"}}" style="display:inline-block;background:#22c55e;color:#0f172a;padding:14px 32px;border-radius:999px;font-weight:600;text-decoration:none;">View order</a>
+  </p>
+  <p style="font-size:13px;color:#94a3b8;">Need help or want to start a return? Reply directly to this email.</p>
+{{end}}

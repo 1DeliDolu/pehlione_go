@@ -11,6 +11,8 @@ type Product struct {
 	Name        string    `gorm:"type:varchar(255);not null"`
 	Slug        string    `gorm:"type:varchar(255);not null;uniqueIndex:ux_products_slug"`
 	Description string    `gorm:"type:text;not null"`
+	CategoryName string   `gorm:"type:varchar(255)"`
+	CategorySlug string   `gorm:"type:varchar(255)"`
 	Status      string    `gorm:"type:varchar(32);not null;default:active"`
 	CreatedAt   time.Time `gorm:"type:datetime(3);not null"`
 	UpdatedAt   time.Time `gorm:"type:datetime(3);not null"`

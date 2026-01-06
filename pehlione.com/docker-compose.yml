@@ -4,13 +4,40 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: pehlione_go
-      MYSQL_USER: musta
-      MYSQL_PASSWORD: pehlione
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ""
     ports:
       - "3306:3306"
     volumes:
       - mysqldata:/var/lib/mysql
     command: ["--default-authentication-plugin=mysql_native_password"]
+
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_DSN=root:@tcp(db:3306)/pehlione_go?parseTime=true
+      - GIN_MODE=release
+    command: ["/app/web"]
+
+  worker:
+    build: .
+    depends_on:
+      - db
+    environment:
+      - DB_DSN=root:@tcp(db:3306)/pehlione_go?parseTime=true
+    command: ["/app/worker"]
+
+  sms-worker:
+    build: .
+    depends_on:
+      - db
+    environment:
+      - DB_DSN=root:@tcp(db:3306)/pehlione_go?parseTime=true
+    command: ["/app/sms-worker"]
 
 volumes:
   mysqldata: {}

@@ -555,20 +555,46 @@ func ProductsShowPage(vm ProductsShowVM) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<button id=\"add_to_cart_btn\" type=\"submit\" class=\"mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden\">Add to cart</button><p id=\"variant_status\" class=\"mt-3 text-sm text-gray-600\"></p></form><a href=\"/products\" class=\"mt-4 block text-center text-indigo-600 hover:text-indigo-700\">← Continue shopping</a></div><!-- Description --><div class=\"py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16\"><div><h3 class=\"sr-only\">Description</h3><div class=\"space-y-6\"><p class=\"text-base text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<button id=\"add_to_cart_btn\" type=\"submit\" class=\"mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden\">Add to cart</button><form method=\"post\" action=\"/wishlist/items\" class=\"mt-3 flex w-full items-center justify-center\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var29 string
-			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(vm.Product.Description)
+			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(vm.CSRFToken)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products/show.templ`, Line: 211, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products/show.templ`, Line: 199, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</p></div></div><div class=\"mt-10\"><h3 class=\"text-sm font-medium text-gray-900\">Details</h3><div class=\"mt-4 space-y-6\"><p class=\"text-sm text-gray-600\">This product, its variants, and stock will be re-validated during checkout.</p></div></div></div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\"> <input type=\"hidden\" name=\"product_id\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var30 string
+			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(vm.Product.ID)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products/show.templ`, Line: 200, Col: 68}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\"> <button type=\"submit\" class=\"w-full rounded-md border border-gray-200 px-8 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:outline-hidden\">Save to wishlist</button></form><p id=\"variant_status\" class=\"mt-3 text-sm text-gray-600\"></p></form><a href=\"/products\" class=\"mt-4 block text-center text-indigo-600 hover:text-indigo-700\">← Continue shopping</a></div><!-- Description --><div class=\"py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16\"><div><h3 class=\"sr-only\">Description</h3><div class=\"space-y-6\"><p class=\"text-base text-gray-900\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var31 string
+			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(vm.Product.Description)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products/show.templ`, Line: 219, Col: 67}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</p></div></div><div class=\"mt-10\"><h3 class=\"text-sm font-medium text-gray-900\">Details</h3><div class=\"mt-4 space-y-6\"><p class=\"text-sm text-gray-600\">This product, its variants, and stock will be re-validated during checkout.</p></div></div></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -578,7 +604,7 @@ func ProductsShowPage(vm ProductsShowVM) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<script src=\"/static/js/product-detail.js\" defer></script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<script src=\"/static/js/product-detail.js\" defer></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -602,12 +628,12 @@ func ProductsNotFoundPage(vm SimpleVM) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var30 == nil {
-			templ_7745c5c3_Var30 = templ.NopComponent
+		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var32 == nil {
+			templ_7745c5c3_Var32 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var31 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var33 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -619,13 +645,13 @@ func ProductsNotFoundPage(vm SimpleVM) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<div class=\"bg-white px-6 py-24 sm:py-32 lg:px-8\"><div class=\"text-center\"><p class=\"text-base font-semibold text-indigo-600\">404</p><h1 class=\"mt-4 text-balance text-5xl font-semibold tracking-tight text-gray-900 sm:text-6xl\">Product not found</h1><p class=\"mt-6 text-lg leading-7 text-gray-600\">The product you were looking for is not available.</p><div class=\"mt-10 flex items-center justify-center gap-x-6\"><a href=\"/products\" class=\"rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500\">Back to products</a></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<div class=\"bg-white px-6 py-24 sm:py-32 lg:px-8\"><div class=\"text-center\"><p class=\"text-base font-semibold text-indigo-600\">404</p><h1 class=\"mt-4 text-balance text-5xl font-semibold tracking-tight text-gray-900 sm:text-6xl\">Product not found</h1><p class=\"mt-6 text-lg leading-7 text-gray-600\">The product you were looking for is not available.</p><div class=\"mt-10 flex items-center justify-center gap-x-6\"><a href=\"/products\" class=\"rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500\">Back to products</a></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = shared.Base(shared.BaseVM{Title: vm.Title}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var31), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = shared.Base(shared.BaseVM{Title: vm.Title}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var33), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

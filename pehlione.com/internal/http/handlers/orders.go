@@ -15,6 +15,7 @@ import (
 	"pehlione.com/app/internal/http/render"
 	"pehlione.com/app/internal/modules/orders"
 	"pehlione.com/app/internal/modules/payments"
+	"pehlione.com/app/internal/modules/shipping"
 	"pehlione.com/app/internal/pdf"
 	"pehlione.com/app/internal/shared/apperr"
 	"pehlione.com/app/pkg/view"
@@ -60,6 +61,18 @@ func (h *OrdersHandler) Detail(c *gin.Context) {
 			PriceEach:   view.MoneyFromCents(it.UnitPriceCents, it.Currency),
 			LineTotal:   view.MoneyFromCents(it.LineTotalCents, it.Currency),
 		})
+	}
+
+	shipRepo := shipping.NewRepo(h.DB)
+	if shipments, err := shipRepo.ListByOrder(c.Request.Context(), id); err == nil {
+		for _, s := range shipments {
+			vm.Shipments = append(vm.Shipments, view.OrderShipment{
+				Carrier:        s.Carrier,
+				Status:         s.Status,
+				TrackingNumber: strOrEmpty(s.TrackingNumber),
+				TrackingURL:    strOrEmpty(s.TrackingURL),
+			})
+		}
 	}
 
 	render.Component(c, http.StatusOK, pages.OrderDetail(
@@ -229,4 +242,11 @@ func formatOrderAddressLines(addr orderAddress) []string {
 		lines = append(lines, "Tel: "+addr.Phone)
 	}
 	return lines
+}
+
+func strOrEmpty(p *string) string {
+	if p == nil {
+		return ""
+	}
+	return *p
 }

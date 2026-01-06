@@ -1,0 +1,7 @@
+{{define "content"}}
+Order {{.OrderID}} is confirmed.
+Status: {{.StatusLabel}}
+Total: {{.Total}}
+
+View order: {{trackURL .OrderURL "order_paid"}}
+{{end}}

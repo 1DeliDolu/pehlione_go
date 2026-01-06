@@ -1,5 +1,9 @@
 package shared
 
+import (
+	"pehlione.com/app/templates/layout"
+)
+
 type BaseVM struct {
 	Title string
 }
@@ -11,23 +15,10 @@ templ Base(vm BaseVM) {
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
 			<title>{ vm.Title }</title>
-			<script src="https://cdn.tailwindcss.com"></script>
+			<link rel="stylesheet" href="/static/css/app.css"/>
 		</head>
-		<body class="bg-white text-gray-900">
-			<!-- Header -->
-			<header class="border-b border-gray-200">
-				<div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-					<div class="flex items-center justify-between">
-						<a href="/" class="text-lg font-semibold">
-							<span class="text-yellow-400">Pehli</span><span class="text-orange-500">ONE</span>
-						</a>
-						<nav class="flex items-center gap-4 text-sm">
-							<a href="/products" class="text-gray-700 hover:text-gray-900">Products</a>
-							<a href="/cart" class="text-gray-700 hover:text-gray-900">Cart</a>
-						</nav>
-					</div>
-				</div>
-			</header>
+		<body class="bg-white text-gray-900 antialiased">
+			@layout.Header()
 
 			<!-- Main -->
 			<main>
@@ -40,6 +31,8 @@ templ Base(vm BaseVM) {
 					<p class="text-center text-sm text-gray-500">© 2026 Pehlione. All rights reserved.</p>
 				</div>
 			</footer>
+			<!-- TailwindPlus Elements for el-popover, el-dialog, el-disclosure -->
+			<script type="module" src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1"></script>
 		</body>
 	</html>
 }

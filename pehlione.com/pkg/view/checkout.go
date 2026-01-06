@@ -23,15 +23,22 @@ type CheckoutForm struct {
 }
 
 type CheckoutSummary struct {
-	Currency      string
-	Subtotal      string
-	Shipping      string
-	Total         string
-	Items         int
-	Lines         []CartItem
-	SubtotalCents int
-	ShippingCents int
-	TotalCents    int
+	Currency          string
+	BaseCurrency      string
+	Subtotal          string
+	Shipping          string
+	Total             string
+	Items             int
+	Lines             []CartItem
+	SubtotalCents     int
+	ShippingCents     int
+	TotalCents        int
+	BaseSubtotalCents int
+	BaseShippingCents int
+	BaseTotalCents    int
+	DisplaySubtotalCents int
+	DisplayShippingCents int
+	DisplayTotalCents    int
 }
 
 type PaymentOption struct {

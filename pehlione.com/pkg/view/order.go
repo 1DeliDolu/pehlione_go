@@ -10,15 +10,21 @@ type OrderItem struct {
 }
 
 type OrderDetail struct {
-	ID       string
-	Status   string
-	Currency string
+	ID        string
+	Status    string
+	Currency  string
+	Subtotal  string
+	Shipping  string
+	Tax       string
+	Discount  string
+	Total     string
+	Items     []OrderItem
+	Shipments []OrderShipment
+}
 
-	Subtotal string
-	Shipping string
-	Tax      string
-	Discount string
-	Total    string
-
-	Items []OrderItem
+type OrderShipment struct {
+	Carrier        string
+	Status         string
+	TrackingNumber string
+	TrackingURL    string
 }

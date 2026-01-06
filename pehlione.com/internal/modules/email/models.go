@@ -3,28 +3,33 @@ package email
 import (
 	"context"
 	"time"
+
+	"gorm.io/datatypes"
 )
 
 type OutboxEmail struct {
-	ID            string     `gorm:"type:char(36);primaryKey"`
-	ToEmail       string     `gorm:"type:varchar(255);not null"`
-	Subject       string     `gorm:"type:varchar(255);not null"`
-	BodyText      *string    `gorm:"type:text"`
-	BodyHTML      *string    `gorm:"type:mediumtext"`
-	Status        string     `gorm:"type:varchar(16);not null"`
-	Attempts      int        `gorm:"not null"`
-	LastError     *string    `gorm:"type:varchar(255)"`
-	NextAttemptAt time.Time  `gorm:"type:datetime(3);not null"`
-	CreatedAt     time.Time  `gorm:"type:datetime(3);not null"`
-	SentAt        *time.Time `gorm:"type:datetime(3)"`
+	ID           int64          `gorm:"primaryKey;autoIncrement"`
+	ToEmail      string         `gorm:"type:varchar(320);not null"`
+	Template     string         `gorm:"type:varchar(128);not null"`
+	Payload      datatypes.JSON `gorm:"type:json;not null"`
+	Status       string         `gorm:"type:varchar(16);not null"`
+	AttemptCount int            `gorm:"not null;default:0"`
+	LastError    *string        `gorm:"type:text"`
+	ScheduledAt  time.Time      `gorm:"type:datetime(3);not null"`
+	LockedAt     *time.Time     `gorm:"type:datetime(3)"`
+	LockedBy     *string        `gorm:"type:varchar(128)"`
+	SentAt       *time.Time     `gorm:"type:datetime(3)"`
+	CreatedAt    time.Time      `gorm:"type:datetime(3);not null"`
+	UpdatedAt    time.Time      `gorm:"type:datetime(3);not null"`
 }
 
-func (OutboxEmail) TableName() string { return "outbox_emails" }
+func (OutboxEmail) TableName() string { return "email_outbox" }
 
 const (
-	StatusPending = "pending"
-	StatusSent    = "sent"
-	StatusFailed  = "failed"
+	StatusPending    = "pending"
+	StatusProcessing = "processing"
+	StatusSent       = "sent"
+	StatusFailed     = "failed"
 )
 
 type Message struct {

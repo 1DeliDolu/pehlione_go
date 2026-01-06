@@ -52,17 +52,13 @@ func containsScheme(s string) bool {
 
 // AuthHandlers contains handlers for authentication routes.
 type AuthHandlers struct {
-	db       *gorm.DB
-	flash    *flash.Codec
-	sessCfg  middleware.SessionCfg
-	repo     *auth.Repo
-	cartCK   *cartcookie.Codec
-	emailSvc interface {
-		Enqueue(ctx context.Context, to, subject, text, html string) error
-	}
+	db        *gorm.DB
+	flash     *flash.Codec
+	sessCfg   middleware.SessionCfg
+	repo      *auth.Repo
+	cartCK    *cartcookie.Codec
 	verifySvc interface {
 		StartEmailVerification(ctx context.Context, userID, userEmail string) error
-		ConfirmWithCode(ctx context.Context, userID, code string) error
 	}
 }
 
@@ -74,22 +70,13 @@ func NewAuthHandlers(db *gorm.DB, flashCodec *flash.Codec, sessCfg middleware.Se
 		sessCfg:   sessCfg,
 		repo:      auth.NewRepo(db),
 		cartCK:    cartCK,
-		emailSvc:  nil,
 		verifySvc: nil,
 	}
-}
-
-// SetEmailService sets the email service
-func (h *AuthHandlers) SetEmailService(svc interface {
-	Enqueue(ctx context.Context, to, subject, text, html string) error
-}) {
-	h.emailSvc = svc
 }
 
 // SetVerifyService sets the verification service
 func (h *AuthHandlers) SetVerifyService(svc interface {
 	StartEmailVerification(ctx context.Context, userID, userEmail string) error
-	ConfirmWithCode(ctx context.Context, userID, code string) error
 }) {
 	h.verifySvc = svc
 }
@@ -318,56 +305,3 @@ func (h *AuthHandlers) VerifyGet(c *gin.Context) {
 }
 
 // VerifyPost verifies the email code
-func (h *AuthHandlers) VerifyPost(c *gin.Context) {
-	code := strings.TrimSpace(c.PostForm("code"))
-	returnTo := normalizeReturnTo(c.PostForm("return_to"))
-
-	if code == "" {
-		render.Component(c, http.StatusBadRequest, pages.VerifyEmail(
-			middleware.GetFlash(c),
-			middleware.GetCSRFToken(c),
-			returnTo,
-		))
-		return
-	}
-
-	if h.verifySvc == nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "verification service not available"})
-		return
-	}
-
-	// Get current user from session (if already created)
-	u, ok := middleware.CurrentUser(c)
-	if !ok {
-		// User might not be in session yet; for now, we expect them to be
-		render.RedirectWithFlash(c, h.flash, "/login", view.FlashError, "Oturum bulunamadı. Lütfen tekrar deneyin.")
-		return
-	}
-
-	// Verify code
-	if err := h.verifySvc.ConfirmWithCode(c.Request.Context(), u.ID, code); err != nil {
-		log.Printf("Email verification failed: %v", err)
-		render.Component(c, http.StatusBadRequest, pages.VerifyEmail(
-			middleware.GetFlash(c),
-			middleware.GetCSRFToken(c),
-			returnTo,
-		))
-		return
-	}
-
-	// Create session and redirect
-	sess, err := middleware.CreateSession(h.sessCfg, u.ID)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	c.SetCookie(h.sessCfg.CookieName, sess.ID, int(h.sessCfg.TTL.Seconds()), "/", "", h.sessCfg.Secure, true)
-
-	dest := "/products"
-	if returnTo != "" {
-		dest = returnTo
-	}
-
-	render.RedirectWithFlash(c, h.flash, dest, view.FlashSuccess, "E-posta doğrulandı. Hoş geldiniz!")
-}

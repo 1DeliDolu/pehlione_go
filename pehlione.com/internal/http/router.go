@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	"pehlione.com/app/internal/config"
 	"pehlione.com/app/internal/http/cartcookie"
 	"pehlione.com/app/internal/http/flash"
 	"pehlione.com/app/internal/http/handlers"
@@ -21,19 +22,33 @@ import (
 	"pehlione.com/app/internal/http/render"
 	"pehlione.com/app/internal/modules/auth"
 	"pehlione.com/app/internal/modules/cart"
+	"pehlione.com/app/internal/modules/currency"
 	"pehlione.com/app/internal/modules/email"
+	"pehlione.com/app/internal/modules/fx"
 	"pehlione.com/app/internal/modules/orders"
 	"pehlione.com/app/internal/modules/payments"
 	"pehlione.com/app/internal/modules/products"
+	"pehlione.com/app/internal/modules/shipping"
 	"pehlione.com/app/internal/modules/users"
+	"pehlione.com/app/internal/modules/wishlist"
+	"pehlione.com/app/internal/sms"
 	"pehlione.com/app/internal/storage"
 	"pehlione.com/app/pkg/view"
+	
 )
 
-func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
+func NewRouter(logger *slog.Logger, db *gorm.DB, cfg config.AppConfig) *gin.Engine {
 	// --- Secrets / Codecs ---
 	secret := mustSecret()
-	appBaseURL := envOr("APP_BASE_URL", "http://localhost:8080")
+	appBaseURL := cfg.AppBaseURL
+	brandName := cfg.Email.FromName
+	if strings.TrimSpace(brandName) == "" {
+		brandName = "pehliONE"
+	}
+	supportEmail := cfg.Email.SMTP.From
+	if strings.TrimSpace(supportEmail) == "" {
+		supportEmail = "support@pehlione.com"
+	}
 
 	flashCookieName := envOr("FLASH_COOKIE_NAME", "pehlione_flash")
 	flashSecure := envBool("FLASH_COOKIE_SECURE", false)
@@ -54,11 +69,20 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 		TTL:        time.Duration(ttlHours) * time.Hour,
 	}
 
+	fxRepo := fx.NewRepo(db)
+	fxSvc := fx.NewService(fxRepo, cfg.Currency.BaseCurrency)
+	currencySvc := currency.NewService(fxSvc, currency.Config{
+		BaseCurrency:      cfg.Currency.BaseCurrency,
+		DefaultDisplay:    cfg.Currency.DefaultDisplay,
+		DisplayCurrencies: cfg.Currency.DisplayCurrencies,
+		ChargeCurrencies:  cfg.Currency.ChargeCurrencies,
+	})
+
 	// Cart cookie
 	cartCKName := envOr("CART_COOKIE_NAME", "pehlione_cart")
 	cartCKSecure := envBool("CART_COOKIE_SECURE", false)
 	cartCK := cartcookie.New(secret, cartCKName, cartCKSecure)
-	cartSvc := cart.NewService(db)
+	cartSvc := cart.NewService(db, currencySvc)
 
 	// --- Router + Middleware order ---
 	r := gin.New()
@@ -79,6 +103,11 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	r.Use(middleware.FlashMiddleware(flashCodec))
 	r.Use(middleware.CSRF(csrfCfg))
 	r.Use(middleware.SessionMiddleware(sessCfg))
+	r.Use(middleware.CurrencyPreference(middleware.CurrencyPrefCfg{
+		Service:    currencySvc,
+		CookieName: cfg.Currency.CookieName,
+		Secure:     cfg.Currency.CookieSecure,
+	}))
 
 	var emailSvc *email.OutboxService
 
@@ -112,7 +141,8 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	// Products (public product listing)
 	productsRepo := products.NewGormRepo(db)
 	productsSvc := products.NewService(productsRepo)
-	productsH := handlers.NewProductsHandler(productsSvc)
+	wishlistSvc := wishlist.NewService(db)
+	productsH := handlers.NewProductsHandler(productsSvc, currencySvc)
 	r.GET("/products", productsH.List)
 	r.GET("/products/:slug", productsH.Show)
 
@@ -120,7 +150,7 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	cartCodec := cartcookie.New(secret, "pehlione_cart", false) // dev: secure=false
 
 	// Cart (public shopping cart page)
-	cartH := handlers.NewCartHandler(db, flashCodec, cartCodec)
+	cartH := handlers.NewCartHandler(db, flashCodec, cartCodec, cartSvc)
 	r.GET("/cart", cartH.Get)
 	r.POST("/cart/items", cartH.Add) // SSR: add to cart + redirect (form submission dari product pages)
 	r.POST("/cart/items/update", cartH.Update)
@@ -135,13 +165,18 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 		render.RedirectWithFlash(c, flashCodec, "/", view.FlashSuccess, "İşlem başarılı (flash).")
 	})
 
+	currencyPrefH := handlers.NewCurrencyPreferenceHandler(currencySvc, cfg.Currency.CookieName, cfg.Currency.CookieSecure)
+	r.POST("/settings/currency", currencyPrefH.Post)
+
 	// Auth (DB-backed): signup/login/logout
 	authH := handlers.NewAuthHandlers(db, flashCodec, sessCfg, cartCK)
 
 	r.GET("/signup", authH.SignupGet)
 	r.POST("/signup", authH.SignupPost)
 	r.GET("/verify", authH.VerifyGet)
-	r.POST("/verify", authH.VerifyPost)
+
+	verifyEmailH := handlers.NewVerifyEmailHandler(db)
+	r.GET("/verify-email", verifyEmailH.Get)
 	r.GET("/login", authH.LoginGet)
 	r.POST("/login", authH.LoginPost)
 	r.POST("/logout", authH.LogoutPost)
@@ -167,19 +202,18 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	admin.POST("/products/:id/variants", ph.AddVariant)
 
 	// Payment provider (used by both checkout and admin)
-	mockSecret := envOr("MOCK_WEBHOOK_SECRET", "dev_secret_change_me")
-	provider := payments.NewMockProvider(mockSecret)
+	var provider payments.Provider
+	switch cfg.Payment.Provider {
+	case "", "mock":
+		provider = payments.NewMockProvider(cfg.Payment.MockWebhookSecret, cfg.Payment.MockWebhookTolerance)
+	default:
+		log.Fatalf("unsupported payment provider: %s", cfg.Payment.Provider)
+	}
 
 	// Webhook service + handler
 	webhookSvc := payments.NewWebhookService(db)
 	webhookH := handlers.NewWebhookHandler(logger, provider, webhookSvc)
 
-	// Admin Orders
-	refundSvc := payments.NewRefundService(db, provider)
-	adminOrders := adminHandlers.NewOrdersHandler(db, refundSvc)
-	admin.GET("/orders", adminOrders.List)
-	admin.GET("/orders/:id", adminOrders.Detail)
-	admin.POST("/orders/:id/:action", adminOrders.Action) // ship|deliver|cancel|refund
 	admin.POST("/products/:id/variants/:vid/delete", ph.DeleteVariant)
 	admin.POST("/products/:id/variants/:vid", ph.UpdateVariant)
 	admin.POST("/products/:id/variants/:vid/sku", ph.UpdateVariantSKU)
@@ -191,35 +225,48 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	// Protected routes (require authentication)
 	authOnly := r.Group("")
 	authOnly.Use(middleware.RequireAuth(flashCodec))
-	authOnly.GET("/account", handlers.Account)
+
+	authRepo := auth.NewRepo(db)
+	accountH := handlers.NewAccountHandler(authRepo, flashCodec)
+	authOnly.GET("/account", accountH.Get)
+	authOnly.POST("/account/password", accountH.ChangePassword)
+
 
 	// Account routes
-	authRepo := auth.NewRepo(db)
 	ordersRepo := orders.NewRepo(db)
-	accountH := handlers.NewAccountOrdersHandler(ordersRepo, authRepo, flashCodec)
+	accountOrdersH := handlers.NewAccountOrdersHandler(ordersRepo, authRepo, flashCodec)
 	account := r.Group("/account")
 	account.Use(middleware.RequireAuth(flashCodec))
-	account.GET("/orders", accountH.List)
-	account.POST("/account/password", accountH.ChangePassword)
+	account.GET("/orders", accountOrdersH.List)
+
+	smsRepo := sms.NewOutboxRepository(db)
+	smsH := handlers.NewSmsHandler(db, smsRepo, flashCodec, logger)
+	account.POST("/sms", smsH.PostAccountSMS)
+	account.POST("/sms/verify", smsH.PostAccountSMSVerify)
+	account.POST("/sms/send-code", smsH.PostSendCode)
+
+	wishlistH := handlers.NewWishlistHandler(wishlistSvc, productsRepo, currencySvc)
+	authOnly.GET("/wishlist", wishlistH.List)
+	authOnly.POST("/wishlist/items", wishlistH.Add)
+	authOnly.POST("/wishlist/items/remove", wishlistH.Remove)
 
 	// --- Email worker initialization ---
-	if envBool("EMAIL_SEND_ENABLED", true) {
+	if cfg.Email.Enabled {
 		emailSvc = email.NewService(db)
 
-		// Create SMTP sender
 		smtpCfg := email.SMTPCfg{
-			Host:   envOr("SMTP_HOST", "localhost"),
-			Port:   envInt("SMTP_PORT", 1025),
-			User:   os.Getenv("SMTP_USER"),
-			Pass:   os.Getenv("SMTP_PASS"),
-			From:   envOr("SMTP_FROM", "no-reply@pehlione.com"),
-			UseTLS: envBool("SMTP_USE_TLS", false),
+			Host:   cfg.Email.SMTP.Host,
+			Port:   cfg.Email.SMTP.Port,
+			User:   cfg.Email.SMTP.User,
+			Pass:   cfg.Email.SMTP.Pass,
+			From:   cfg.Email.SMTP.From,
+			UseTLS: cfg.Email.SMTP.UseTLS,
 		}
 		log.Printf("Email worker: initializing with SMTP host=%s port=%d from=%s", smtpCfg.Host, smtpCfg.Port, smtpCfg.From)
 		sender := email.NewSMTPSender(smtpCfg)
 
-		// Start worker in background
-		worker := email.NewWorker(db, sender)
+		renderer := email.NewRenderer(appBaseURL, brandName, supportEmail)
+		worker := email.NewWorker(db, sender, renderer)
 		go func() {
 			log.Printf("Email worker: starting")
 			if err := worker.Run(context.Background()); err != nil {
@@ -227,19 +274,73 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 			}
 		}()
 
-		// Inject email service and verify service into auth handlers
-		verifyService := users.NewVerifyService(db, emailSvc, appBaseURL)
-		authH.SetEmailService(emailSvc)
+		verifyService := users.NewVerifyService(db, emailSvc, appBaseURL, cfg.Email.FromName)
 		authH.SetVerifyService(verifyService)
 		log.Printf("Email worker: verification service configured with base URL %s", appBaseURL)
 	} else {
-		log.Printf("Email worker: disabled (EMAIL_SEND_ENABLED=false)")
+		log.Printf("Email worker: disabled via config")
 	}
 
+	var shippingSvc *shipping.Service
+	if cfg.Shipping.Enabled {
+		var shipProvider shipping.Provider
+		switch cfg.Shipping.Provider {
+		case "", "mock":
+			shipProvider = shipping.NewMockProvider(cfg.Shipping.MockBaseURL)
+		default:
+			log.Fatalf("unsupported shipping provider: %s", cfg.Shipping.Provider)
+		}
+
+		shippingSvc = shipping.NewService(db, shipProvider, emailSvc, appBaseURL)
+		shipWorker := shipping.NewWorker(shippingSvc)
+		go func() {
+			log.Printf("Shipping worker: starting provider=%s", shipProvider.Name())
+			if err := shipWorker.Run(context.Background()); err != nil {
+				log.Printf("Shipping worker stopped: %v", err)
+			}
+		}()
+	} else {
+		log.Printf("Shipping worker: disabled via config")
+	}
+
+	if cfg.Currency.FX.Provider != "" {
+		var rateProvider fx.Provider
+		switch cfg.Currency.FX.Provider {
+		case "exchange_rate_host", "exchangerate_host":
+			rateProvider = fx.NewExchangeRateHostProvider(cfg.Currency.FX.Symbols)
+		default:
+			log.Printf("FX worker: unsupported provider %s", cfg.Currency.FX.Provider)
+		}
+		if rateProvider != nil {
+			interval := time.Duration(cfg.Currency.FX.RefreshMinutes) * time.Minute
+			fxWorker := fx.NewWorker(fxSvc, rateProvider, cfg.Currency.BaseCurrency, cfg.Currency.FX.Symbols, interval)
+			go func() {
+				log.Printf("FX worker: starting provider=%s interval=%s", rateProvider.Name(), interval)
+				if err := fxWorker.Run(context.Background()); err != nil {
+					log.Printf("FX worker stopped: %v", err)
+				}
+			}()
+		}
+	}
+
+	// Admin Orders (depends on email/shipping services)
+	refundSvc := payments.NewRefundService(db, provider, emailSvc, appBaseURL)
+	adminSmsH := adminHandlers.NewSmsHandler(db, flashCodec, logger)
+	admin.GET("/sms/failed", adminSmsH.ListFailed)
+
+	adminOrders := adminHandlers.NewOrdersHandler(db, flashCodec, refundSvc, shippingSvc)
+	admin.GET("/orders", adminOrders.List)
+	admin.GET("/orders/:id", adminOrders.Detail)
+	admin.GET("/orders/:id/refund", adminOrders.RefundForm)
+	admin.POST("/orders/:id/refund", adminOrders.Refund)
+	admin.POST("/orders/:id/shipments/label", adminOrders.CreateShipmentLabel)
+	admin.POST("/orders/:id/shipments/manual", adminOrders.CreateManualShipment)
+	admin.POST("/orders/:id/:action", adminOrders.Action) // ship|deliver|cancel|refund
+
 	// Checkout & Orders
-	orderSvc := orders.NewService(db)
+	orderSvc := orders.NewService(db, currencySvc)
 	paySvc := payments.NewService(db, provider)
-	checkoutH := handlers.NewCheckoutHandler(db, flashCodec, cartCK, orderSvc, emailSvc, appBaseURL)
+	checkoutH := handlers.NewCheckoutHandler(db, flashCodec, cartCK, cartSvc, orderSvc, emailSvc, currencySvc, appBaseURL)
 	ordersH := handlers.NewOrdersHandler(db, flashCodec, paySvc)
 	cartBadgeH := handlers.NewCartBadgeHandler(db)
 	cartAddH := handlers.NewCartAddHandler(db)

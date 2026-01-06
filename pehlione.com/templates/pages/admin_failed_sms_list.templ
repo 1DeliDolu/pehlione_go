@@ -1,0 +1,52 @@
+package pages
+
+import (
+	"fmt"
+	"pehlione.com/app/internal/sms"
+	"pehlione.com/app/templates/layout"
+	"pehlione.com/app/pkg/view"
+	"time"
+)
+
+templ AdminFailedSMSList(failedSMS []sms.OutboxMessage, flash *view.Flash) {
+	@layout.AdminBase("Failed SMS Jobs", flash, renderAdminFailedSMSList(failedSMS))
+}
+
+templ renderAdminFailedSMSList(failedSMS []sms.OutboxMessage) {
+	<h1 class="text-2xl font-semibold mb-4">Failed SMS Jobs</h1>
+
+	if len(failedSMS) == 0 {
+		<p>No failed SMS jobs found.</p>
+	} else {
+		<div class="overflow-x-auto">
+			<table class="table w-full">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>To Phone</th>
+						<th>Template</th>
+						<th>Status</th>
+						<th>Attempt Count</th>
+						<th>Last Error</th>
+						<th>Created At</th>
+						<th>Scheduled At</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, msg := range failedSMS {
+						<tr>
+							<td>{ fmt.Sprintf("%d", msg.ID) }</td>
+							<td>{ msg.ToPhoneE164 }</td>
+							<td>{ msg.Template }</td>
+							<td>{ msg.Status }</td>
+							<td>{ fmt.Sprintf("%d", msg.AttemptCount) }</td>
+							<td>{ msg.LastError.String }</td>
+							<td>{ msg.CreatedAt.Format(time.RFC822) }</td>
+							<td>{ msg.ScheduledAt.Format(time.RFC822) }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+}

@@ -3,12 +3,15 @@ package payments
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"pehlione.com/app/internal/emails"
+	emailmod "pehlione.com/app/internal/modules/email"
 	"pehlione.com/app/internal/modules/orders"
 )
 
@@ -20,10 +23,12 @@ var (
 type RefundService struct {
 	db       *gorm.DB
 	provider Provider
+	emailSvc *emailmod.OutboxService
+	baseURL  string
 }
 
-func NewRefundService(db *gorm.DB, p Provider) *RefundService {
-	return &RefundService{db: db, provider: p}
+func NewRefundService(db *gorm.DB, p Provider, emailSvc *emailmod.OutboxService, baseURL string) *RefundService {
+	return &RefundService{db: db, provider: p, emailSvc: emailSvc, baseURL: baseURL}
 }
 
 type RefundOrderInput struct {
@@ -273,7 +278,31 @@ func (s *RefundService) RefundOrder(ctx context.Context, in RefundOrderInput) (R
 			Note:        ptr("refund_id=" + ref.ID),
 			CreatedAt:   now,
 		}
-		return tx.WithContext(ctx).Create(&ev).Error
+		if err := tx.WithContext(ctx).Create(&ev).Error; err != nil {
+			return err
+		}
+
+		var orderItems []orders.OrderItem
+		orderItems, _ = s.loadOrderItems(ctx, tx, ord.ID)
+
+		if s.emailSvc != nil {
+			if emailAddr, err := s.lookupOrderEmail(ctx, tx, ord); err == nil && emailAddr != "" {
+				statusLabel := "Refunded"
+				if newStatus == "partially_refunded" {
+					statusLabel = "Partially refunded"
+				}
+				reason := strings.TrimSpace(in.Reason)
+				payload := emails.BuildOrderPayload(s.baseURL, ord, orderItems, statusLabel, reason)
+				payload["PreviewText"] = "Refund processed - funds will post shortly."
+				_ = s.emailSvc.EnqueueTx(ctx, tx, emailmod.Job{
+					To:       emailAddr,
+					Template: emailmod.TemplateOrderRefunded,
+					Payload:  payload,
+				})
+			}
+		}
+
+		return nil
 	})
 	if err != nil {
 		return RefundOrderResult{}, err
@@ -287,3 +316,22 @@ func (s *RefundService) RefundOrder(ctx context.Context, in RefundOrderInput) (R
 }
 
 func ptr(s string) *string { return &s }
+
+func (s *RefundService) lookupOrderEmail(ctx context.Context, tx *gorm.DB, ord orders.Order) (string, error) {
+	if ord.GuestEmail != nil && *ord.GuestEmail != "" {
+		return *ord.GuestEmail, nil
+	}
+	if ord.UserID != nil && *ord.UserID != "" {
+		var email string
+		if err := tx.WithContext(ctx).Table("users").Select("email").Where("id = ?", *ord.UserID).Take(&email).Error; err == nil {
+			return email, nil
+		}
+	}
+	return "", nil
+}
+
+func (s *RefundService) loadOrderItems(ctx context.Context, tx *gorm.DB, orderID string) ([]orders.OrderItem, error) {
+	var items []orders.OrderItem
+	err := tx.WithContext(ctx).Order("created_at ASC").Find(&items, "order_id = ?", orderID).Error
+	return items, err
+}

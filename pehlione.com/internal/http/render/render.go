@@ -23,3 +23,8 @@ func Component(c *gin.Context, status int, component templ.Component) {
 		c.String(http.StatusInternalServerError, "Error rendering template")
 	}
 }
+
+func Redirect(c *gin.Context, location string) {
+	c.Redirect(http.StatusFound, location)
+}
+

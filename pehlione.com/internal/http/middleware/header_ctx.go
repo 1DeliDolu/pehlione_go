@@ -14,6 +14,8 @@ func BuildHeaderCtx(c *gin.Context) view.HeaderCtx {
 		CartQty:   GetCartBadgeQty(c),
 		Cart:      GetCartPreview(c),
 	}
+	h.DisplayCurrency = GetDisplayCurrency(c)
+	h.CurrencyOptions = GetCurrencyOptions(c)
 
 	u, ok := CurrentUser(c)
 	if !ok {

@@ -9,6 +9,10 @@ type User struct {
 	Role            string     `gorm:"type:varchar(32);not null;default:user"`
 	Status          string     `gorm:"type:varchar(16);not null;default:pending"`
 	EmailVerifiedAt *time.Time `gorm:"type:datetime(3)"`
+	PhoneE164       *string    `gorm:"type:varchar(32)"`
+	PhoneVerifiedAt *time.Time `gorm:"type:datetime"`
+	SMSOptIn        bool       `gorm:"type:tinyint(1);not null;default:0"`
+	SMSOptOutAt     *time.Time `gorm:"type:datetime"`
 	CreatedAt       time.Time  `gorm:"type:datetime(3);not null"`
 	UpdatedAt       time.Time  `gorm:"type:datetime(3);not null"`
 }

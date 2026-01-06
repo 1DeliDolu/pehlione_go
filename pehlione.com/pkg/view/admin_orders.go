@@ -49,9 +49,11 @@ type AdminOrderDetail struct {
 	Discount string
 	Total    string
 
-	Items     []AdminOrderItem
-	Events    []AdminOrderEvent
-	Financial []AdminOrderFinancialEntry
+	Items             []AdminOrderItem
+	Events            []AdminOrderEvent
+	Shipments         []AdminShipment
+	Financial         []AdminOrderFinancialEntry
+	ShippingAvailable bool
 }
 
 type AdminOrderFinancialEntry struct {
@@ -62,4 +64,17 @@ type AdminOrderFinancialEntry struct {
 	RefType     string
 	RefID       string
 	At          string
+}
+
+type AdminShipment struct {
+	ID             string
+	Carrier        string
+	Status         string
+	TrackingNumber string
+	TrackingURL    string
+	LabelURL       string
+	Note           string
+	ShippedAt      string
+	DeliveredAt    string
+	Error          string
 }

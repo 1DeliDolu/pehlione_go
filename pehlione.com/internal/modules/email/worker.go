@@ -2,23 +2,36 @@ package email
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
+const maxSendAttempts = 8
+
 type Worker struct {
-	db     *gorm.DB
-	sender Sender
+	svc       *OutboxService
+	sender    Sender
+	renderer  *Renderer
+	workerID  string
+	batchSize int
 }
 
-func NewWorker(db *gorm.DB, sender Sender) *Worker {
-	return &Worker{db: db, sender: sender}
+func NewWorker(db *gorm.DB, sender Sender, renderer *Renderer) *Worker {
+	return &Worker{
+		svc:       NewService(db),
+		sender:    sender,
+		renderer:  renderer,
+		workerID:  fmt.Sprintf("worker-%s", uuid.NewString()),
+		batchSize: 10,
+	}
 }
 
-// Run starts the email worker loop
+// Run starts the email worker loop.
 func (w *Worker) Run(ctx context.Context) error {
 	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
@@ -28,85 +41,95 @@ func (w *Worker) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			_ = w.tick(ctx)
+			if err := w.tick(ctx); err != nil {
+				log.Printf("Email worker %s tick error: %v", w.workerID, err)
+			}
 		}
 	}
 }
 
 func (w *Worker) tick(ctx context.Context) error {
-	svc := NewService(w.db)
-
-	// Get batch of pending emails
-	batch, err := svc.GetPending(ctx, 10)
+	batch, err := w.svc.LockBatch(ctx, w.workerID, w.batchSize)
 	if err != nil {
-		log.Printf("Email worker GetPending error: %v", err)
 		return err
 	}
 	if len(batch) == 0 {
 		return nil
 	}
 
-	log.Printf("Email worker: processing %d pending emails", len(batch))
-
-	for _, e := range batch {
-		if err := w.sendOne(ctx, svc, e.ID); err != nil {
-			log.Printf("Email worker: failed to send %s: %v", e.ID, err)
-		}
+	log.Printf("Email worker %s: processing %d messages", w.workerID, len(batch))
+	for _, job := range batch {
+		w.processOne(ctx, job)
 	}
 	return nil
 }
 
-func (w *Worker) sendOne(ctx context.Context, svc *OutboxService, id string) error {
-	var e OutboxEmail
-	if err := w.db.WithContext(ctx).First(&e, "id = ?", id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil
+func (w *Worker) processOne(ctx context.Context, job OutboxEmail) {
+	var payload map[string]any
+	if err := json.Unmarshal(job.Payload, &payload); err != nil {
+		log.Printf("Email worker %s: invalid payload for %d: %v", w.workerID, job.ID, err)
+		if markErr := w.svc.MarkFailed(ctx, job.ID, truncateStr(err.Error(), 255)); markErr != nil {
+			log.Printf("Email worker %s: mark failed error for %d: %v", w.workerID, job.ID, markErr)
 		}
-		return err
+		return
 	}
 
-	if e.Status != StatusPending {
-		return nil
+	subject := "pehlione notification"
+	htmlBody := ""
+	textBody := ""
+	if w.renderer != nil {
+		result, err := w.renderer.Render(job.Template, payload)
+		if err != nil {
+			log.Printf("Email worker %s: render failed for %d: %v", w.workerID, job.ID, err)
+			if markErr := w.svc.MarkRetry(ctx, job.ID, truncateStr(err.Error(), 255), backoff(job.AttemptCount+1)); markErr != nil {
+				log.Printf("Email worker %s: mark retry error for %d: %v", w.workerID, job.ID, markErr)
+			}
+			return
+		}
+		subject = result.Subject
+		htmlBody = string(result.HTML)
+		textBody = string(result.Text)
+	} else {
+		if subj, ok := payload["subject"].(string); ok && subj != "" {
+			subject = subj
+		}
+		if html, ok := payload["html"].(string); ok {
+			htmlBody = html
+		}
+		if text, ok := payload["text"].(string); ok {
+			textBody = text
+		}
 	}
 
-	text := ""
-	html := ""
-	if e.BodyText != nil {
-		text = *e.BodyText
-	}
-	if e.BodyHTML != nil {
-		html = *e.BodyHTML
-	}
-
-	log.Printf("Email worker: sending email %s to %s (attempt %d)", id, e.ToEmail, e.Attempts+1)
-
-	err := w.sender.Send(ctx, Message{
-		To:      e.ToEmail,
-		Subject: e.Subject,
-		Text:    text,
-		HTML:    html,
+	attemptNum := job.AttemptCount + 1
+	log.Printf("Email worker %s: sending %d to %s (attempt %d)", w.workerID, job.ID, job.ToEmail, attemptNum)
+	sendErr := w.sender.Send(ctx, Message{
+		To:      job.ToEmail,
+		Subject: subject,
+		Text:    textBody,
+		HTML:    htmlBody,
 	})
 
-	now := time.Now()
-	if err == nil {
-		log.Printf("Email worker: successfully sent %s to %s", id, e.ToEmail)
-		return svc.UpdateStatus(ctx, id, StatusSent, &now, nil)
+	if sendErr == nil {
+		if err := w.svc.MarkSent(ctx, job.ID); err != nil {
+			log.Printf("Email worker %s: mark sent failed for %d: %v", w.workerID, job.ID, err)
+		}
+		return
 	}
 
-	log.Printf("Email worker: failed to send %s to %s: %v", id, e.ToEmail, err)
-
-	// Retry logic
-	attempts := e.Attempts + 1
-	nextAttempt := now.Add(backoff(attempts))
-	errMsg := truncate(err.Error(), 250)
-	status := StatusPending
-
-	if attempts >= 8 {
-		status = StatusFailed
-		log.Printf("Email %s failed after %d attempts: %v", id, attempts, err)
+	log.Printf("Email worker %s: send failed for %d: %v", w.workerID, job.ID, sendErr)
+	errMsg := truncateStr(sendErr.Error(), 255)
+	if attemptNum >= maxSendAttempts {
+		if err := w.svc.MarkFailed(ctx, job.ID, errMsg); err != nil {
+			log.Printf("Email worker %s: mark failed error for %d: %v", w.workerID, job.ID, err)
+		}
+		return
 	}
 
-	return svc.UpdateRetry(ctx, id, attempts, nextAttempt, &errMsg, status)
+	delay := backoff(attemptNum)
+	if err := w.svc.MarkRetry(ctx, job.ID, errMsg, delay); err != nil {
+		log.Printf("Email worker %s: mark retry error for %d: %v", w.workerID, job.ID, err)
+	}
 }
 
 func backoff(attempt int) time.Duration {
@@ -122,7 +145,7 @@ func backoff(attempt int) time.Duration {
 	}
 }
 
-func truncate(s string, n int) string {
+func truncateStr(s string, n int) string {
 	if n <= 0 || len(s) <= n {
 		return s
 	}

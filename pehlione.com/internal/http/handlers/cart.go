@@ -20,13 +20,14 @@ import (
 
 // CartHandler handles cart operations (GET /cart, POST /cart/add)
 type CartHandler struct {
-	DB    *gorm.DB
-	Flash *flash.Codec
-	CK    *cartcookie.Codec
+	DB      *gorm.DB
+	Flash   *flash.Codec
+	CK      *cartcookie.Codec
+	CartSvc *cart.Service
 }
 
-func NewCartHandler(db *gorm.DB, flashCodec *flash.Codec, ck *cartcookie.Codec) *CartHandler {
-	return &CartHandler{DB: db, Flash: flashCodec, CK: ck}
+func NewCartHandler(db *gorm.DB, flashCodec *flash.Codec, ck *cartcookie.Codec, svc *cart.Service) *CartHandler {
+	return &CartHandler{DB: db, Flash: flashCodec, CK: ck, CartSvc: svc}
 }
 
 // Add handles POST /cart/add - adds item to cart and redirects to /cart
@@ -171,12 +172,16 @@ func (h *CartHandler) Remove(c *gin.Context) {
 // Get handles GET /cart - displays cart page
 func (h *CartHandler) Get(c *gin.Context) {
 	flash := middleware.GetFlash(c)
-	svc := cart.NewService(h.DB)
+	displayCurrency := middleware.GetDisplayCurrency(c)
+	svc := h.CartSvc
+	if svc == nil {
+		svc = cart.NewService(h.DB, nil)
+	}
 
 	// Check if user is logged in
 	if u, ok := middleware.CurrentUser(c); ok {
 		// Logged-in user: fetch from DB
-		cartPage, err := svc.BuildCartPageForUser(c, u.ID)
+		cartPage, err := svc.BuildCartPageForUser(c.Request.Context(), u.ID, displayCurrency)
 		if err != nil {
 			log.Printf("CartGet: error building page: %v", err)
 			render.Component(c, http.StatusOK, pages.Cart(flash, view.CartPage{Items: []view.CartItem{}}))
@@ -189,7 +194,7 @@ func (h *CartHandler) Get(c *gin.Context) {
 
 	// Guest user: fetch from cookie
 	cc, _ := h.CK.Get(c)
-	cartPage, err := svc.BuildCartPageFromCookie(c, cc)
+	cartPage, err := svc.BuildCartPageFromCookie(c.Request.Context(), cc, displayCurrency)
 	if err != nil {
 		log.Printf("CartGet: error building guest cart: %v", err)
 		render.Component(c, http.StatusOK, pages.Cart(flash, view.CartPage{Items: []view.CartItem{}}))

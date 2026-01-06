@@ -12,22 +12,31 @@ type Order struct {
 	UserID     *string `gorm:"type:char(36);index:ix_orders_user_id_created_at,priority:1"`
 	GuestEmail *string `gorm:"type:varchar(255)"`
 
-	Status   string `gorm:"type:varchar(32);not null"`
-	Currency string `gorm:"type:char(3);not null"`
+	Status          string  `gorm:"type:varchar(32);not null"`
+	Currency        string  `gorm:"type:char(3);not null"`
+	BaseCurrency    string  `gorm:"type:char(3);not null"`
+	DisplayCurrency string  `gorm:"type:char(3);not null"`
+	FXRate          float64 `gorm:"type:decimal(18,8);default:1"`
+	FXSource        *string `gorm:"type:varchar(32)"`
 
-	SubtotalCents int `gorm:"not null"`
-	TaxCents      int `gorm:"not null"`
-	ShippingCents int `gorm:"not null"`
-	DiscountCents int `gorm:"not null"`
-	TotalCents    int `gorm:"not null"`
+	SubtotalCents     int `gorm:"not null"`
+	TaxCents          int `gorm:"not null"`
+	ShippingCents     int `gorm:"not null"`
+	DiscountCents     int `gorm:"not null"`
+	TotalCents        int `gorm:"not null"`
+	BaseSubtotalCents int `gorm:"not null"`
+	BaseTaxCents      int `gorm:"not null"`
+	BaseShippingCents int `gorm:"not null"`
+	BaseDiscountCents int `gorm:"not null"`
+	BaseTotalCents    int `gorm:"not null"`
 
 	ShippingAddressJSON datatypes.JSON `gorm:"type:json"`
 	BillingAddressJSON  datatypes.JSON `gorm:"type:json"`
 
 	IdempotencyKey *string    `gorm:"type:varchar(64);index"`
 	PaidAt         *time.Time `gorm:"-"` // TODO: add to database via migration
-	RefundedCents  int        `gorm:"-"` // TODO: add to database via migration
-	RefundedAt     *time.Time `gorm:"-"` // TODO: add to database via migration
+	RefundedCents  int        `gorm:"type:bigint;not null;default:0"`
+	RefundedAt     *time.Time `gorm:"type:datetime(3)"`
 
 	CreatedAt time.Time `gorm:"type:datetime(3);not null"`
 	UpdatedAt time.Time `gorm:"type:datetime(3);not null"`
@@ -44,10 +53,13 @@ type OrderItem struct {
 	SKU         string         `gorm:"type:varchar(64);not null"`
 	OptionsJSON datatypes.JSON `gorm:"type:json;not null"`
 
-	UnitPriceCents int    `gorm:"not null"`
-	Currency       string `gorm:"type:char(3);not null"`
-	Quantity       int    `gorm:"not null"`
-	LineTotalCents int    `gorm:"not null"`
+	UnitPriceCents     int    `gorm:"not null"`
+	Currency           string `gorm:"type:char(3);not null"`
+	Quantity           int    `gorm:"not null"`
+	LineTotalCents     int    `gorm:"not null"`
+	BaseCurrency       string `gorm:"type:char(3);not null"`
+	BaseUnitPriceCents int    `gorm:"not null"`
+	BaseLineTotalCents int    `gorm:"not null"`
 
 	CreatedAt time.Time `gorm:"type:datetime(3);not null"`
 }

@@ -12,6 +12,8 @@ type HeaderCtx struct {
 	CSRFToken string // required: for logout form
 	CartQty   int    // number of items in cart
 	Cart      CartPage
+	DisplayCurrency string
+	CurrencyOptions []string
 }
 
 // WithHeaderCtx injects HeaderCtx into request context.

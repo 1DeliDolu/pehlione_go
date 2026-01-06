@@ -5,27 +5,32 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"pehlione.com/app/internal/http/flash"
 	"pehlione.com/app/internal/http/middleware"
 	"pehlione.com/app/internal/http/render"
 	"pehlione.com/app/internal/modules/orders"
 	"pehlione.com/app/internal/modules/payments"
+	"pehlione.com/app/internal/modules/shipping"
 	"pehlione.com/app/internal/shared/apperr"
 	"pehlione.com/app/pkg/view"
 	"pehlione.com/app/templates/pages"
 )
 
 type OrdersHandler struct {
-	DB        *gorm.DB
-	RefundSvc *payments.RefundService
+	DB          *gorm.DB
+	Flash       *flash.Codec
+	RefundSvc   *payments.RefundService
+	ShippingSvc *shipping.Service
 }
 
-func NewOrdersHandler(db *gorm.DB, refundSvc *payments.RefundService) *OrdersHandler {
-	return &OrdersHandler{DB: db, RefundSvc: refundSvc}
+func NewOrdersHandler(db *gorm.DB, fl *flash.Codec, refundSvc *payments.RefundService, shipSvc *shipping.Service) *OrdersHandler {
+	return &OrdersHandler{DB: db, Flash: fl, RefundSvc: refundSvc, ShippingSvc: shipSvc}
 }
 
 func (h *OrdersHandler) List(c *gin.Context) {
@@ -131,6 +136,25 @@ func (h *OrdersHandler) Detail(c *gin.Context) {
 		})
 	}
 
+	shipRepo := shipping.NewRepo(h.DB)
+	if shipments, err := shipRepo.ListByOrder(c.Request.Context(), id); err == nil {
+		for _, s := range shipments {
+			vm.Shipments = append(vm.Shipments, view.AdminShipment{
+				ID:             s.ID,
+				Carrier:        s.Carrier,
+				Status:         s.Status,
+				TrackingNumber: ptrStr(s.TrackingNumber),
+				TrackingURL:    ptrStr(s.TrackingURL),
+				LabelURL:       ptrStr(s.LabelURL),
+				Note:           ptrStr(s.Note),
+				ShippedAt:      formatTimePtr(s.ShippedAt),
+				DeliveredAt:    formatTimePtr(s.DeliveredAt),
+				Error:          ptrStr(s.ErrorMessage),
+			})
+		}
+	}
+	vm.ShippingAvailable = h.ShippingSvc != nil
+
 	render.Component(c, http.StatusOK, pages.AdminOrderDetail(
 		middleware.GetFlash(c),
 		middleware.GetCSRFToken(c),
@@ -151,39 +175,6 @@ func (h *OrdersHandler) Action(c *gin.Context) {
 	note := strings.TrimSpace(c.PostForm("note"))
 	confirm := c.PostForm("confirm") == "1"
 	if !confirm {
-		c.Redirect(http.StatusFound, "/admin/orders/"+id)
-		return
-	}
-
-	// Handle refund separately via RefundService
-	if action == "refund" {
-		idem := strings.TrimSpace(c.PostForm("idempotency_key"))
-		if idem == "" {
-			idem = randHex(16)
-		}
-
-		amountCents := parseInt(c.PostForm("amount_cents"), 0)
-
-		res, err := h.RefundSvc.RefundOrder(c.Request.Context(), payments.RefundOrderInput{
-			OrderID:        id,
-			ActorUserID:    u.ID,
-			IdempotencyKey: idem,
-			AmountCents:    amountCents,
-			Reason:         note,
-		})
-		if err != nil {
-			if errors.Is(err, payments.ErrNotRefundable) {
-				c.Error(apperr.InvalidErr("Order not refundable.", nil))
-				return
-			}
-			c.Error(apperr.Wrap(err))
-			return
-		}
-
-		msg := "Refund processed: " + res.Status
-		if res.Idempotent {
-			msg += " (idempotent)"
-		}
 		c.Redirect(http.StatusFound, "/admin/orders/"+id)
 		return
 	}
@@ -234,6 +225,149 @@ func ptrStr(p *string) string {
 	return *p
 }
 
+func formatTimePtr(t *time.Time) string {
+	if t == nil {
+		return ""
+	}
+	return t.Format("2006-01-02 15:04")
+}
+
 func randHex(nBytes int) string {
 	return uuid.New().String()[:nBytes]
+}
+
+func (h *OrdersHandler) RefundForm(c *gin.Context) {
+	id := c.Param("id")
+	vm := pages.AdminOrderRefundVM{
+		OrderID:   id,
+		CSRFToken: middleware.GetCSRFToken(c),
+		Error:     "",
+	}
+	render.Component(c, http.StatusOK, pages.AdminOrderRefund(vm))
+}
+
+func (h *OrdersHandler) Refund(c *gin.Context) {
+	id := c.Param("id")
+
+	u, ok := middleware.CurrentUser(c)
+	if !ok {
+		c.Error(apperr.ForbiddenErr("Giri�Y gerekli."))
+		return
+	}
+
+	note := strings.TrimSpace(c.PostForm("note"))
+	idem := randHex(16)
+
+	res, err := h.RefundSvc.RefundOrder(c.Request.Context(), payments.RefundOrderInput{
+		OrderID:        id,
+		ActorUserID:    u.ID,
+		IdempotencyKey: idem,
+		AmountCents:    0,
+		Reason:         note,
+	})
+	if err != nil {
+		vm := pages.AdminOrderRefundVM{
+			OrderID:   id,
+			CSRFToken: middleware.GetCSRFToken(c),
+			Error:     err.Error(),
+		}
+		render.Component(c, http.StatusBadRequest, pages.AdminOrderRefund(vm))
+		return
+	}
+
+	_ = res
+	c.Redirect(http.StatusSeeOther, "/admin/orders/"+id+"?refunded=1")
+}
+
+func (h *OrdersHandler) CreateShipmentLabel(c *gin.Context) {
+	if h.ShippingSvc == nil {
+		c.Error(apperr.Wrap(errors.New("kargo entegrasyonu devre dışı")))
+		return
+	}
+	id := c.Param("id")
+
+	u, ok := middleware.CurrentUser(c)
+	if !ok {
+		c.Error(apperr.ForbiddenErr("Giriş gerekli."))
+		return
+	}
+	if c.PostForm("confirm") != "1" {
+		render.RedirectWithFlash(c, h.Flash, "/admin/orders/"+id, view.FlashWarning, "Onay gerekli.")
+		return
+	}
+
+	carrier := strings.TrimSpace(c.PostForm("carrier"))
+	service := strings.TrimSpace(c.PostForm("service"))
+	note := strings.TrimSpace(c.PostForm("note"))
+
+	_, err := h.ShippingSvc.QueueShipment(c.Request.Context(), shipping.QueueShipmentInput{
+		OrderID:     id,
+		ActorUserID: u.ID,
+		Carrier:     carrier,
+		Service:     service,
+		Note:        note,
+	})
+	if err != nil {
+		msg := friendlyShipmentErr(err)
+		render.RedirectWithFlash(c, h.Flash, "/admin/orders/"+id, view.FlashError, msg)
+		return
+	}
+
+	render.RedirectWithFlash(c, h.Flash, "/admin/orders/"+id, view.FlashSuccess, "Kargo etiketi kuyruğa alındı.")
+}
+
+func (h *OrdersHandler) CreateManualShipment(c *gin.Context) {
+	if h.ShippingSvc == nil {
+		c.Error(apperr.Wrap(errors.New("kargo entegrasyonu devre dışı")))
+		return
+	}
+	id := c.Param("id")
+
+	u, ok := middleware.CurrentUser(c)
+	if !ok {
+		c.Error(apperr.ForbiddenErr("Giriş gerekli."))
+		return
+	}
+	if c.PostForm("confirm") != "1" {
+		render.RedirectWithFlash(c, h.Flash, "/admin/orders/"+id, view.FlashWarning, "Onay gerekli.")
+		return
+	}
+
+	carrier := strings.TrimSpace(c.PostForm("carrier"))
+	tracking := strings.TrimSpace(c.PostForm("tracking_no"))
+	trackingURL := strings.TrimSpace(c.PostForm("tracking_url"))
+	note := strings.TrimSpace(c.PostForm("note"))
+
+	_, err := h.ShippingSvc.CreateManualShipment(c.Request.Context(), shipping.ManualShipmentInput{
+		OrderID:     id,
+		ActorUserID: u.ID,
+		Carrier:     carrier,
+		TrackingNo:  tracking,
+		TrackingURL: trackingURL,
+		Note:        note,
+	})
+	if err != nil {
+		msg := friendlyShipmentErr(err)
+		render.RedirectWithFlash(c, h.Flash, "/admin/orders/"+id, view.FlashError, msg)
+		return
+	}
+
+	render.RedirectWithFlash(c, h.Flash, "/admin/orders/"+id, view.FlashSuccess, "Kargo kaydı oluşturuldu.")
+}
+
+func friendlyShipmentErr(err error) string {
+	switch {
+	case errors.Is(err, shipping.ErrCarrierRequired):
+		return "Kargo firması zorunlu."
+	case errors.Is(err, shipping.ErrTrackingRequired):
+		return "Takip numarası zorunlu."
+	case errors.Is(err, shipping.ErrOrderNotShippable):
+		return "Sipariş kargo için uygun durumda değil."
+	case errors.Is(err, shipping.ErrProviderUnavailable):
+		return "Kargo sağlayıcısına ulaşılamadı."
+	case errors.Is(err, shipping.ErrActorRequired):
+		return "İşlem yapan kullanıcı bulunamadı."
+	default:
+		return "Kargo işlemi başarısız: " + err.Error()
+	}
 }

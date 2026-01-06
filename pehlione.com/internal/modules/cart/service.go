@@ -3,20 +3,23 @@ package cart
 import (
 	"context"
 	"errors"
+	"math"
 	"sort"
 
 	"gorm.io/gorm"
 
 	"pehlione.com/app/internal/http/cartcookie"
+	"pehlione.com/app/internal/modules/currency"
 	"pehlione.com/app/pkg/view"
 )
 
 type Service struct {
-	db *gorm.DB
+	db       *gorm.DB
+	currency *currency.Service
 }
 
-func NewService(db *gorm.DB) *Service {
-	return &Service{db: db}
+func NewService(db *gorm.DB, curr *currency.Service) *Service {
+	return &Service{db: db, currency: curr}
 }
 
 type cartRow struct {
@@ -32,7 +35,7 @@ type cartRow struct {
 
 var ErrMixedCurrency = errors.New("cart contains multiple currencies")
 
-func (s *Service) BuildCartPageForUser(ctx context.Context, userID string) (view.CartPage, error) {
+func (s *Service) BuildCartPageForUser(ctx context.Context, userID string, displayCurrency string) (view.CartPage, error) {
 	if userID == "" {
 		return view.CartPage{}, errors.New("missing userID")
 	}
@@ -64,12 +67,12 @@ ORDER BY ci.created_at ASC;
 		return view.CartPage{}, err
 	}
 
-	return buildCartVMFromRows(rows)
+	return s.buildCartVMFromRows(ctx, rows, displayCurrency)
 }
 
-func (s *Service) BuildCartPageFromCookie(ctx context.Context, c *cartcookie.Cart) (view.CartPage, error) {
+func (s *Service) BuildCartPageFromCookie(ctx context.Context, c *cartcookie.Cart, displayCurrency string) (view.CartPage, error) {
 	if c == nil || len(c.Items) == 0 {
-		return view.CartPage{Items: []view.CartItem{}}, nil
+		return view.CartPage{Items: []view.CartItem{}, Currency: displayCurrency, BaseCurrency: s.baseCurrency()}, nil
 	}
 
 	// variantID -> qty
@@ -128,29 +131,46 @@ func (s *Service) BuildCartPageFromCookie(ctx context.Context, c *cartcookie.Car
 		final = append(final, r)
 	}
 
-	return buildCartVMFromRows(final)
+	return s.buildCartVMFromRows(ctx, final, displayCurrency)
 }
 
-func buildCartVMFromRows(rows []cartRow) (view.CartPage, error) {
+func (s *Service) buildCartVMFromRows(ctx context.Context, rows []cartRow, displayCurrency string) (view.CartPage, error) {
 	vm := view.CartPage{Items: make([]view.CartItem, 0, len(rows))}
 
-	currency := ""
-	subtotalCents := 0
+	baseCurrency := s.baseCurrency()
+	if baseCurrency == "" && len(rows) > 0 {
+		baseCurrency = rows[0].Currency
+	}
+	displayCurrency = s.normalizeDisplayCurrency(ctx, displayCurrency)
+
+	rate := 1.0
+	if s.currency != nil {
+		if rateInfo, err := s.currency.DisplayRate(ctx, displayCurrency); err == nil && rateInfo.Rate > 0 {
+			rate = rateInfo.Rate
+		}
+	}
+
+	subtotalBase := 0
+	subtotalDisplay := 0
 	count := 0
 
 	for _, r := range rows {
 		if r.Qty <= 0 {
 			continue
 		}
-		if currency == "" {
-			currency = r.Currency
-		} else if r.Currency != "" && r.Currency != currency {
+		if baseCurrency == "" {
+			baseCurrency = r.Currency
+		} else if r.Currency != "" && r.Currency != baseCurrency {
 			return view.CartPage{}, ErrMixedCurrency
 		}
 
 		line := r.PriceCents * r.Qty
-		subtotalCents += line
+		subtotalBase += line
 		count += r.Qty
+
+		convertedUnit := convertAmount(r.PriceCents, rate)
+		convertedLine := convertAmount(line, rate)
+		subtotalDisplay += convertedLine
 
 		vm.Items = append(vm.Items, view.CartItem{
 			ProductName: r.ProductName,
@@ -159,22 +179,59 @@ func buildCartVMFromRows(rows []cartRow) (view.CartPage, error) {
 			VariantID:   r.VariantID,
 			Qty:         r.Qty,
 
-			UnitPriceCents: r.PriceCents,
-			LineTotalCents: line,
+			UnitPriceCents:     convertedUnit,
+			LineTotalCents:     convertedLine,
+			BaseUnitPriceCents: r.PriceCents,
+			BaseLineTotalCents: line,
 
-			UnitPrice: view.MoneyFromCents(r.PriceCents, currency),
-			LineTotal: view.MoneyFromCents(line, currency),
+			UnitPrice: view.MoneyFromCents(convertedUnit, displayCurrency),
+			LineTotal: view.MoneyFromCents(convertedLine, displayCurrency),
 		})
 	}
 
-	vm.Currency = currency
+	vm.Currency = displayCurrency
+	vm.BaseCurrency = baseCurrency
 	vm.Count = count
-	vm.SubtotalCents = subtotalCents
-	vm.Subtotal = view.MoneyFromCents(subtotalCents, currency)
+	vm.SubtotalCents = subtotalBase
+	vm.DisplaySubtotalCents = subtotalDisplay
+	vm.Subtotal = view.MoneyFromCents(subtotalDisplay, displayCurrency)
+	vm.BaseSubtotalCents = subtotalBase
 
-	// MVP: total = subtotal (shipping/tax/discount sonra)
-	vm.TotalCents = subtotalCents
-	vm.Total = view.MoneyFromCents(subtotalCents, currency)
+	vm.TotalCents = subtotalBase
+	vm.DisplayTotalCents = subtotalDisplay
+	vm.Total = view.MoneyFromCents(subtotalDisplay, displayCurrency)
+	vm.BaseTotalCents = subtotalBase
 
 	return vm, nil
+}
+
+func (s *Service) baseCurrency() string {
+	if s.currency != nil {
+		return s.currency.BaseCurrency()
+	}
+	return ""
+}
+
+func (s *Service) normalizeDisplayCurrency(ctx context.Context, current string) string {
+	if s.currency == nil {
+		if current == "" {
+			return s.baseCurrency()
+		}
+		return current
+	}
+	if normalized, ok := s.currency.NormalizeDisplay(current); ok {
+		return normalized
+	}
+	return s.currency.DefaultDisplayCurrency()
+}
+
+func convertAmount(base int, rate float64) int {
+	if rate == 1 {
+		return base
+	}
+	val := float64(base) * rate
+	if val >= 0 {
+		return int(math.Round(val))
+	}
+	return -int(math.Round(math.Abs(val)))
 }

@@ -3,7 +3,9 @@ package orders
 import (
 	"context"
 	"errors"
+	"math"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -12,13 +14,17 @@ import (
 	"gorm.io/gorm/clause"
 
 	"pehlione.com/app/internal/modules/checkout"
+	"pehlione.com/app/internal/modules/currency"
 )
 
 type Service struct {
-	db *gorm.DB
+	db       *gorm.DB
+	currency *currency.Service
 }
 
-func NewService(db *gorm.DB) *Service { return &Service{db: db} }
+func NewService(db *gorm.DB, curr *currency.Service) *Service {
+	return &Service{db: db, currency: curr}
+}
 
 type CreateFromCartInput struct {
 	CartID string
@@ -36,6 +42,8 @@ type CreateFromCartInput struct {
 
 	ShippingAddressJSON []byte // optional
 	BillingAddressJSON  []byte // optional
+	DisplayCurrency     string
+	ChargeCurrency      string
 }
 
 type CreateFromCartResult struct {
@@ -198,17 +206,20 @@ func (s *Service) CreateFromCart(ctx context.Context, in CreateFromCartInput) (C
 			p := pmap[v.ProductID]
 
 			oi = append(oi, OrderItem{
-				ID:             uuid.NewString(),
-				OrderID:        "", // aşağıda set
-				VariantID:      v.ID,
-				ProductName:    p.Name,
-				SKU:            v.SKU,
-				OptionsJSON:    v.Options,
-				UnitPriceCents: v.PriceCents,
-				Currency:       currency,
-				Quantity:       q,
-				LineTotalCents: line,
-				CreatedAt:      now,
+				ID:                 uuid.NewString(),
+				OrderID:            "", // aşağıda set
+				VariantID:          v.ID,
+				ProductName:        p.Name,
+				SKU:                v.SKU,
+				OptionsJSON:        v.Options,
+				UnitPriceCents:     v.PriceCents,
+				Currency:           currency,
+				Quantity:           q,
+				LineTotalCents:     line,
+				BaseCurrency:       currency,
+				BaseUnitPriceCents: v.PriceCents,
+				BaseLineTotalCents: line,
+				CreatedAt:          now,
 			})
 		}
 
@@ -217,20 +228,69 @@ func (s *Service) CreateFromCart(ctx context.Context, in CreateFromCartInput) (C
 			total = 0
 		}
 
+		baseCurrency := s.normalizeBaseCurrency(currency)
+		displayCurrency := s.normalizeDisplayCurrency(in.DisplayCurrency, baseCurrency)
+		chargeCurrency := s.normalizeChargeCurrency(in.ChargeCurrency, displayCurrency, baseCurrency)
+
+		chargeSubtotal := subtotal
+		chargeShipping := in.ShippingCents
+		chargeTax := in.TaxCents
+		chargeDiscount := in.DiscountCents
+		chargeTotal := total
+		fxRate := 1.0
+		fxSource := "base"
+
+		if chargeCurrency != baseCurrency && s.currency != nil {
+			if convertedSubtotal, rateInfo, err := s.currency.ConvertCharge(ctx, subtotal, chargeCurrency); err == nil && rateInfo.Rate > 0 {
+				fxRate = rateInfo.Rate
+				if strings.TrimSpace(rateInfo.Source) != "" {
+					fxSource = rateInfo.Source
+				}
+				chargeSubtotal = convertedSubtotal
+				chargeShipping = convertWithRate(in.ShippingCents, fxRate)
+				chargeTax = convertWithRate(in.TaxCents, fxRate)
+				chargeDiscount = convertWithRate(in.DiscountCents, fxRate)
+				chargeTotal = convertWithRate(total, fxRate)
+				for i := range oi {
+					oi[i].UnitPriceCents = convertWithRate(oi[i].BaseUnitPriceCents, fxRate)
+					oi[i].LineTotalCents = convertWithRate(oi[i].BaseLineTotalCents, fxRate)
+				}
+			} else {
+				chargeCurrency = baseCurrency
+			}
+		}
+
+		for i := range oi {
+			oi[i].Currency = chargeCurrency
+		}
+
+		var fxSourcePtr *string
+		if fxSource != "" {
+			fxSourcePtr = &fxSource
+		}
+
 		// 7) orders insert
 		orderID := uuid.NewString()
 		o := Order{
-			ID:         orderID,
-			UserID:     in.UserID,
-			GuestEmail: in.GuestEmail,
-			Status:     "created",
-			Currency:   currency,
-
-			SubtotalCents: subtotal,
-			TaxCents:      in.TaxCents,
-			ShippingCents: in.ShippingCents,
-			DiscountCents: in.DiscountCents,
-			TotalCents:    total,
+			ID:                orderID,
+			UserID:            in.UserID,
+			GuestEmail:        in.GuestEmail,
+			Status:            "created",
+			Currency:          chargeCurrency,
+			BaseCurrency:      baseCurrency,
+			DisplayCurrency:   displayCurrency,
+			FXRate:            fxRate,
+			FXSource:          fxSourcePtr,
+			SubtotalCents:     chargeSubtotal,
+			TaxCents:          chargeTax,
+			ShippingCents:     chargeShipping,
+			DiscountCents:     chargeDiscount,
+			TotalCents:        chargeTotal,
+			BaseSubtotalCents: subtotal,
+			BaseTaxCents:      in.TaxCents,
+			BaseShippingCents: in.ShippingCents,
+			BaseDiscountCents: in.DiscountCents,
+			BaseTotalCents:    total,
 
 			ShippingAddressJSON: in.ShippingAddressJSON,
 			BillingAddressJSON:  in.BillingAddressJSON,
@@ -301,4 +361,57 @@ func isDuplicateKey(err error) bool {
 		return me.Number == 1062
 	}
 	return false
+}
+
+func (s *Service) normalizeBaseCurrency(code string) string {
+	cur := strings.ToUpper(strings.TrimSpace(code))
+	if cur != "" {
+		return cur
+	}
+	if s.currency != nil {
+		if base := strings.ToUpper(strings.TrimSpace(s.currency.BaseCurrency())); base != "" {
+			return base
+		}
+	}
+	return "TRY"
+}
+
+func (s *Service) normalizeDisplayCurrency(code, fallback string) string {
+	if s.currency == nil {
+		cur := strings.ToUpper(strings.TrimSpace(code))
+		if cur == "" {
+			return fallback
+		}
+		return cur
+	}
+	if normalized, ok := s.currency.NormalizeDisplay(code); ok {
+		return normalized
+	}
+	return fallback
+}
+
+func (s *Service) normalizeChargeCurrency(code, display, fallback string) string {
+	if s.currency == nil {
+		cur := strings.ToUpper(strings.TrimSpace(code))
+		if cur == "" {
+			return fallback
+		}
+		return cur
+	}
+	cur := strings.ToUpper(strings.TrimSpace(code))
+	if cur != "" && s.currency.CanCharge(cur) {
+		return cur
+	}
+	return s.currency.ChooseChargeCurrency(display)
+}
+
+func convertWithRate(val int, rate float64) int {
+	if rate == 1 {
+		return val
+	}
+	res := float64(val) * rate
+	if res >= 0 {
+		return int(math.Round(res))
+	}
+	return -int(math.Round(math.Abs(res)))
 }

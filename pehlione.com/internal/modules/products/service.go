@@ -17,3 +17,7 @@ func (s *Service) List(ctx context.Context, limit, offset int) ([]Product, error
 func (s *Service) Detail(ctx context.Context, slug string) (Product, error) {
 	return s.repo.GetBySlug(ctx, slug)
 }
+
+func (s *Service) ListWithFilters(ctx context.Context, filters ListFilters) (ListResult, error) {
+	return s.repo.ListFiltered(ctx, filters)
+}

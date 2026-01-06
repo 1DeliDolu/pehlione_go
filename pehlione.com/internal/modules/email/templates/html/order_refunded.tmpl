@@ -1,0 +1,14 @@
+{{define "content"}}
+  <p style="font-size:15px;color:#475569;margin:0 0 16px;">We processed your refund. Funds may take a few business days to settle depending on your bank.</p>
+  <div style="margin:20px 0;padding:20px;border:1px solid #e2e8f0;border-radius:16px;">
+    <p style="margin:0;font-size:14px;color:#1e293b;"><strong>Order ID:</strong> {{.OrderID}}</p>
+    <p style="margin:4px 0 0;font-size:14px;color:#1e293b;"><strong>Status:</strong> {{.StatusLabel}}</p>
+    <p style="margin:4px 0 0;font-size:14px;color:#1e293b;"><strong>Refund total:</strong> {{.Total}}</p>
+    {{if .Reason}}
+    <p style="margin:8px 0 0;font-size:13px;color:#94a3b8;">Reason: {{.Reason}}</p>
+    {{end}}
+  </div>
+  <p style="text-align:center;margin:24px 0;">
+    <a href="{{trackURL .OrderURL "order_refunded"}}" style="display:inline-block;background:#f97316;color:#ffffff;padding:14px 32px;border-radius:999px;font-weight:600;text-decoration:none;">View refund</a>
+  </p>
+{{end}}

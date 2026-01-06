@@ -76,20 +76,59 @@ func AccountBody(csrf string, email string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div></div><form method=\"post\" action=\"/logout\" class=\"mt-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div></div><div class=\"mt-6\"><h2 class=\"text-xl font-semibold\">SMS Notifications</h2><form method=\"post\" action=\"/account/sms\" class=\"mt-4 space-y-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/account.templ`, Line: 20, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/account.templ`, Line: 22, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <button class=\"rounded border px-4 py-2\" type=\"submit\">Sign out</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"form-control\"><label for=\"phone\" class=\"label\"><span class=\"label-text\">Phone Number (E.164 format, e.g., +12125552368)</span></label> <input type=\"tel\" id=\"phone\" name=\"phone\" class=\"input input-bordered w-full max-w-xs\" required></div><div class=\"form-control\"><label class=\"cursor-pointer label\"><span class=\"label-text\">Receive SMS notifications</span> <input type=\"checkbox\" name=\"sms_opt_in\" class=\"checkbox checkbox-primary\"></label></div><button class=\"btn btn-primary\" type=\"submit\">Save</button></form></div><div class=\"mt-6\"><h2 class=\"text-xl font-semibold\">Send Phone Verification Code</h2><form method=\"post\" action=\"/account/sms/send-code\" class=\"mt-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/account.templ`, Line: 42, Col: 54}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"> <button class=\"btn btn-secondary\" type=\"submit\">Send Verification Code</button></form></div><div class=\"mt-6\"><h2 class=\"text-xl font-semibold\">Verify Phone Number</h2><form method=\"post\" action=\"/account/sms/verify\" class=\"mt-4 space-y-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/account.templ`, Line: 50, Col: 54}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><div class=\"form-control\"><label for=\"code\" class=\"label\"><span class=\"label-text\">Verification Code</span></label> <input type=\"text\" id=\"code\" name=\"code\" class=\"input input-bordered w-full max-w-xs\" required></div><button class=\"btn btn-primary\" type=\"submit\">Verify</button></form></div><form method=\"post\" action=\"/logout\" class=\"mt-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/account.templ`, Line: 62, Col: 53}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"> <button class=\"rounded border px-4 py-2\" type=\"submit\">Sign out</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

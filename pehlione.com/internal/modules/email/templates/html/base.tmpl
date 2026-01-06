@@ -1,0 +1,38 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.BrandName}}</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#f6f7fb;font-family:Inter,'Segoe UI',Arial,sans-serif;color:#0f172a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f6f7fb;padding:32px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background-color:#ffffff;border-radius:20px;padding:32px;box-shadow:0 10px 40px rgba(15,23,42,0.1);">
+            <tr>
+              <td style="text-align:center;padding-bottom:24px;">
+                <span style="font-size:14px;font-weight:600;letter-spacing:0.4em;color:#f59e0b;text-transform:uppercase;">{{.BrandName}}</span>
+                <h1 style="margin:12px 0 0;font-size:26px;font-weight:700;color:#0f172a;">{{.EmailTitle}}</h1>
+                {{if .PreviewText}}<p style="margin:8px 0 0;font-size:13px;color:#64748b;">{{.PreviewText}}</p>{{end}}
+              </td>
+            </tr>
+            <tr>
+              <td style="border-top:1px solid #e2e8f0;padding-top:24px;">
+                {{template "content" .}}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-top:32px;text-align:center;font-size:12px;color:#94a3b8;">
+                <p style="margin:0;">© {{.BrandName}} · <a href="{{.BaseURL}}" style="color:#6366f1;text-decoration:none;">Visit store</a></p>
+                <p style="margin:6px 0 0;">Need help? <a href="mailto:{{.SupportEmail}}" style="color:#6366f1;text-decoration:none;">{{.SupportEmail}}</a></p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+{{end}}
