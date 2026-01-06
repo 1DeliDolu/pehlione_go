@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"crypto/rand"
+	"log"
 	"log/slog"
 	"os"
 	"strconv"
@@ -20,6 +21,7 @@ import (
 	"pehlione.com/app/internal/modules/email"
 	"pehlione.com/app/internal/modules/orders"
 	"pehlione.com/app/internal/modules/payments"
+	"pehlione.com/app/internal/modules/users"
 	"pehlione.com/app/internal/storage"
 	"pehlione.com/app/pkg/view"
 )
@@ -115,11 +117,13 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 
 	// Set up email service if configured
 	if mailtrapURL := os.Getenv("MAILTRAP_API_URL"); mailtrapURL != "" {
-		authH.SetEmailService(email.NewMailtrapProvider())
+		// Email service will be set during email worker initialization below
 	}
 
 	r.GET("/signup", authH.SignupGet)
 	r.POST("/signup", authH.SignupPost)
+	r.GET("/verify", authH.VerifyGet)
+	r.POST("/verify", authH.VerifyPost)
 	r.GET("/login", authH.LoginGet)
 	r.POST("/login", authH.LoginPost)
 	r.POST("/logout", authH.LogoutPost)
@@ -199,6 +203,41 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 
 	// Webhooks (not CSRF-protected; signature is security layer)
 	r.POST("/webhooks/mock", webhookH.Handle)
+
+	// --- Email worker initialization ---
+	if envBool("EMAIL_SEND_ENABLED", true) {
+		emailSvc := email.NewService(db)
+
+		// Create SMTP sender
+		smtpCfg := email.SMTPCfg{
+			Host:   envOr("SMTP_HOST", "localhost"),
+			Port:   envInt("SMTP_PORT", 1025),
+			User:   os.Getenv("SMTP_USER"),
+			Pass:   os.Getenv("SMTP_PASS"),
+			From:   envOr("SMTP_FROM", "no-reply@pehlione.com"),
+			UseTLS: envBool("SMTP_USE_TLS", false),
+		}
+		log.Printf("Email worker: initializing with SMTP host=%s port=%d from=%s", smtpCfg.Host, smtpCfg.Port, smtpCfg.From)
+		sender := email.NewSMTPSender(smtpCfg)
+
+		// Start worker in background
+		worker := email.NewWorker(db, sender)
+		go func() {
+			log.Printf("Email worker: starting")
+			if err := worker.Run(context.Background()); err != nil {
+				log.Printf("Email worker stopped: %v", err)
+			}
+		}()
+
+		// Inject email service and verify service into auth handlers
+		appBaseURL := envOr("APP_BASE_URL", "http://localhost:8080")
+		verifyService := users.NewVerifyService(db, emailSvc, appBaseURL)
+		authH.SetEmailService(emailSvc)
+		authH.SetVerifyService(verifyService)
+		log.Printf("Email worker: verification service configured with base URL %s", appBaseURL)
+	} else {
+		log.Printf("Email worker: disabled (EMAIL_SEND_ENABLED=false)")
+	}
 
 	return r
 }

@@ -3,12 +3,14 @@ package auth
 import "time"
 
 type User struct {
-	ID           string    `gorm:"type:char(36);primaryKey"`
-	Email        string    `gorm:"type:varchar(255);not null;uniqueIndex:ux_users_email"`
-	PasswordHash string    `gorm:"type:varchar(255);not null"`
-	Role         string    `gorm:"type:varchar(32);not null;default:user"`
-	CreatedAt    time.Time `gorm:"type:datetime(3);not null"`
-	UpdatedAt    time.Time `gorm:"type:datetime(3);not null"`
+	ID              string     `gorm:"type:char(36);primaryKey"`
+	Email           string     `gorm:"type:varchar(255);not null;uniqueIndex:ux_users_email"`
+	PasswordHash    string     `gorm:"type:varchar(255);not null"`
+	Role            string     `gorm:"type:varchar(32);not null;default:user"`
+	Status          string     `gorm:"type:varchar(16);not null;default:pending"`
+	EmailVerifiedAt *time.Time `gorm:"type:datetime(3)"`
+	CreatedAt       time.Time  `gorm:"type:datetime(3);not null"`
+	UpdatedAt       time.Time  `gorm:"type:datetime(3);not null"`
 }
 
 func (User) TableName() string { return "users" }

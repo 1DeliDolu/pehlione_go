@@ -63,46 +63,59 @@ func ProductsBody(h view.HeaderCtx) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-7xl mx-auto px-4\"><h1 class=\"text-3xl font-semibold mb-6\">Products</h1><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\"><!-- Sample Product 1 --><div class=\"border rounded-lg p-4\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 1</h2><p class=\"text-gray-600 mb-2\">A high-quality product for your needs.</p><p class=\"text-2xl font-bold mb-4\">$19.99</p><!-- SSR Form: Add to cart --><form method=\"post\" action=\"/cart/add\" class=\"w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-white\"><div class=\"mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8\"><h2 class=\"text-2xl font-bold tracking-tight text-gray-900\">Ürünlerimiz</h2><div class=\"mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8\"><!-- Product 1 --><div class=\"group relative\"><div class=\"aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden\"><img src=\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop\" alt=\"Premium Wireless Headphones\" class=\"w-full h-full object-cover\"></div><div class=\"mt-4 flex justify-between\"><div><h3 class=\"text-sm text-gray-700\"><a href=\"#\"><span aria-hidden=\"true\" class=\"absolute inset-0\"></span> Premium Wireless Headphones</a></h3><p class=\"mt-1 text-sm text-gray-500\">Black</p></div><p class=\"text-sm font-medium text-gray-900\">$89.99</p></div><form method=\"post\" action=\"/cart/add\" class=\"mt-4 w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 25, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 36, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_001\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer font-semibold\">Sepete Ekle</button></form></div><!-- Sample Product 2 --><div class=\"border rounded-lg p-4\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 2</h2><p class=\"text-gray-600 mb-2\">Premium quality with great features.</p><p class=\"text-2xl font-bold mb-4\">$29.99</p><form method=\"post\" action=\"/cart/add\" class=\"w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_001\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer\">Sepete Ekle</button></form></div><!-- Product 2 --><div class=\"group relative\"><div class=\"aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden\"><img src=\"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop\" alt=\"Luxury Watch\" class=\"w-full h-full object-cover\"></div><div class=\"mt-4 flex justify-between\"><div><h3 class=\"text-sm text-gray-700\"><a href=\"#\"><span aria-hidden=\"true\" class=\"absolute inset-0\"></span> Luxury Chronograph Watch</a></h3><p class=\"mt-1 text-sm text-gray-500\">Silver</p></div><p class=\"text-sm font-medium text-gray-900\">$199.99</p></div><form method=\"post\" action=\"/cart/add\" class=\"mt-4 w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 44, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 66, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_002\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer font-semibold\">Sepete Ekle</button></form></div><!-- Sample Product 3 --><div class=\"border rounded-lg p-4\"><h2 class=\"text-lg font-semibold mb-2\">Sample Product 3</h2><p class=\"text-gray-600 mb-2\">Exclusive offer with limited quantity.</p><p class=\"text-2xl font-bold mb-4\">$39.99</p><form method=\"post\" action=\"/cart/add\" class=\"w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_002\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer\">Sepete Ekle</button></form></div><!-- Product 3 --><div class=\"group relative\"><div class=\"aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden\"><img src=\"https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&h=500&fit=crop\" alt=\"Designer Sunglasses\" class=\"w-full h-full object-cover\"></div><div class=\"mt-4 flex justify-between\"><div><h3 class=\"text-sm text-gray-700\"><a href=\"#\"><span aria-hidden=\"true\" class=\"absolute inset-0\"></span> Designer Sunglasses</a></h3><p class=\"mt-1 text-sm text-gray-500\">Gold Frame</p></div><p class=\"text-sm font-medium text-gray-900\">$149.99</p></div><form method=\"post\" action=\"/cart/add\" class=\"mt-4 w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 63, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 96, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_003\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition cursor-pointer font-semibold\">Sepete Ekle</button></form></div></div><div class=\"mt-8 p-4 bg-gray-100 rounded\"><h3 class=\"font-semibold mb-2\">How it works:</h3><ul class=\"text-sm text-gray-700 space-y-1\"><li>✓ Click \"Add to Cart\" button</li><li>✓ Form POSTs to /api/cart/add with product_id, variant_id, quantity</li><li>✓ Item is persisted to database (users only)</li><li>✓ Cart badge updates via HTMX (no page reload)</li><li>✓ Session cache is cleared for fresh count</li></ul></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_003\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer\">Sepete Ekle</button></form></div><!-- Product 4 --><div class=\"group relative\"><div class=\"aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden\"><img src=\"https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=500&h=500&fit=crop\" alt=\"Premium Sneakers\" class=\"w-full h-full object-cover\"></div><div class=\"mt-4 flex justify-between\"><div><h3 class=\"text-sm text-gray-700\"><a href=\"#\"><span aria-hidden=\"true\" class=\"absolute inset-0\"></span> Premium Sneakers</a></h3><p class=\"mt-1 text-sm text-gray-500\">White/Black</p></div><p class=\"text-sm font-medium text-gray-900\">$119.99</p></div><form method=\"post\" action=\"/cart/add\" class=\"mt-4 w-full\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/products.templ`, Line: 126, Col: 64}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"> <input type=\"hidden\" name=\"variant_id\" value=\"var_004\"> <input type=\"hidden\" name=\"qty\" value=\"1\"> <button type=\"submit\" class=\"w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer\">Sepete Ekle</button></form></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

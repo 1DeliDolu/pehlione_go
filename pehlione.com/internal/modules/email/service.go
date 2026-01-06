@@ -1,64 +1,78 @@
 package email
 
-type Service interface {
-	SendEmail(to string, toName string, subject string, htmlBody string, textBody string) error
+import (
+	"context"
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type OutboxService struct {
+	db *gorm.DB
 }
 
-// Example: Send order confirmation email
-func SendOrderConfirmation(svc Service, customerEmail string, customerName string, orderID string, total string) error {
-	subject := "Sipariş Onayı - Pehlione"
-	textBody := "Merhaba " + customerName + ",\n\nSiparişiniz (#" + orderID + ") alındı. Toplam: " + total + "\n\nTeşekkürler!"
-
-	htmlBody := `
-<html>
-  <body style="font-family: sans-serif;">
-    <h2>Sipariş Onayı</h2>
-    <p>Merhaba ` + customerName + `,</p>
-    <p>Siparişiniz alındı.</p>
-    <p><strong>Sipariş No:</strong> #` + orderID + `</p>
-    <p><strong>Toplam:</strong> ` + total + `</p>
-    <p>Teşekkürler!</p>
-    <p>Pehlione Ekibi</p>
-  </body>
-</html>
-`
-
-	return svc.SendEmail(customerEmail, customerName, subject, htmlBody, textBody)
+func NewService(db *gorm.DB) *OutboxService {
+	return &OutboxService{db: db}
 }
 
-// Example: Send password reset email
-func SendPasswordReset(svc Service, email string, resetLink string) error {
-	subject := "Şifre Sıfırla - Pehlione"
-	textBody := "Şifrenizi sıfırlamak için: " + resetLink
+// Enqueue adds an email to the outbox for async processing
+func (s *OutboxService) Enqueue(ctx context.Context, to, subject, text, html string) error {
+	now := time.Now()
+	var tptr, hptr *string
+	if text != "" {
+		tptr = &text
+	}
+	if html != "" {
+		hptr = &html
+	}
 
-	htmlBody := `
-<html>
-  <body style="font-family: sans-serif;">
-    <h2>Şifre Sıfırla</h2>
-    <p><a href="` + resetLink + `">Şifrenizi sıfırlamak için tıklayın</a></p>
-    <p>Bu link 1 saat içinde geçerliliğini yitirecektir.</p>
-  </body>
-</html>
-`
-
-	return svc.SendEmail(email, "", subject, htmlBody, textBody)
+	e := OutboxEmail{
+		ID:            uuid.NewString(),
+		ToEmail:       to,
+		Subject:       subject,
+		BodyText:      tptr,
+		BodyHTML:      hptr,
+		Status:        StatusPending,
+		Attempts:      0,
+		LastError:     nil,
+		NextAttemptAt: now,
+		CreatedAt:     now,
+		SentAt:        nil,
+	}
+	return s.db.WithContext(ctx).Create(&e).Error
 }
 
-// Example: Send welcome email
-func SendWelcome(svc Service, email string, name string) error {
-	subject := "Pehlione'ye Hoş Geldiniz!"
-	textBody := "Merhaba " + name + ",\n\nPehlione'ye katıldığınız için teşekkürler!"
+// GetPending returns pending emails ready to be sent
+func (s *OutboxService) GetPending(ctx context.Context, limit int) ([]OutboxEmail, error) {
+	var emails []OutboxEmail
+	err := s.db.WithContext(ctx).
+		Where("status = ? AND next_attempt_at <= ?", StatusPending, time.Now()).
+		Order("created_at ASC").
+		Limit(limit).
+		Find(&emails).Error
+	return emails, err
+}
 
-	htmlBody := `
-<html>
-  <body style="font-family: sans-serif;">
-    <h2>Hoş Geldiniz!</h2>
-    <p>Merhaba ` + name + `,</p>
-    <p>Pehlione'ye katıldığınız için teşekkürler!</p>
-    <p>Kaliteli ürünler keşfetmeye başlayın.</p>
-  </body>
-</html>
-`
+// UpdateStatus updates the status of an email
+func (s *OutboxService) UpdateStatus(ctx context.Context, id, status string, sentAt *time.Time, lastError *string) error {
+	return s.db.WithContext(ctx).Model(&OutboxEmail{}).
+		Where("id = ?", id).
+		Updates(map[string]any{
+			"status":     status,
+			"sent_at":    sentAt,
+			"last_error": lastError,
+		}).Error
+}
 
-	return svc.SendEmail(email, name, subject, htmlBody, textBody)
+// UpdateRetry updates retry info for a failed email
+func (s *OutboxService) UpdateRetry(ctx context.Context, id string, attempts int, nextAttempt time.Time, lastError *string, status string) error {
+	return s.db.WithContext(ctx).Model(&OutboxEmail{}).
+		Where("id = ?", id).
+		Updates(map[string]any{
+			"attempts":        attempts,
+			"last_error":      lastError,
+			"next_attempt_at": nextAttempt,
+			"status":          status,
+		}).Error
 }
