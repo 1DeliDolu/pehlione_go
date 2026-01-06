@@ -16,14 +16,12 @@ type CartItem struct {
 }
 
 type CartPage struct {
-	Items []CartItem
-
-	Currency string
-	Count    int
-
+	Items         []CartItem
+	Currency      string
+	Count         int
 	SubtotalCents int
 	Subtotal      string
-
-	TotalCents int
-	Total      string
+	TotalCents    int
+	Total         string
+	CSRFToken     string
 }

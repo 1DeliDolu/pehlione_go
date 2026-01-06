@@ -83,7 +83,7 @@ func CheckoutBody(
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"mx-auto max-w-6xl px-4 py-8\"><h1 class=\"text-3xl font-semibold text-gray-900\">Güvenli Checkout</h1><p class=\"mt-1 text-sm text-gray-500\">Misafir veya kayıtlı kullanıcı olarak adresinizi doldurun, ödeme yöntemini seçin ve siparişinizi onaylayın.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"mx-auto max-w-6xl px-4 py-8\"><h1 class=\"text-3xl font-semibold text-gray-900\">Secure checkout</h1><p class=\"mt-1 text-sm text-gray-500\">Checkout as a guest or a signed-in user: enter your address, choose a payment method, and confirm your order.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -95,7 +95,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(pageErr)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 38, Col: 104}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 40, Col: 104}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -113,7 +113,7 @@ func CheckoutBody(
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 43, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 45, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -126,13 +126,13 @@ func CheckoutBody(
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(form.IdemKey)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 44, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 46, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"><section class=\"space-y-4\"><div><p class=\"text-xs font-semibold uppercase tracking-wide text-indigo-600\">1. Müşteri Bilgileri</p><h2 class=\"text-xl font-semibold text-gray-900\">İletişim & Adres</h2></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"><section class=\"space-y-4\"><div><p class=\"text-xs font-semibold uppercase tracking-wide text-indigo-600\">1. Customer information</p><h2 class=\"text-xl font-semibold text-gray-900\">Contact & address</h2></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -144,13 +144,13 @@ func CheckoutBody(
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(form.Email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 55, Col: 149}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 57, Col: 149}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" placeholder=\"ornek@mail.com\"> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" placeholder=\"name@email.com\"> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -162,7 +162,7 @@ func CheckoutBody(
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(errs["email"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 57, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 59, Col: 60}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -178,32 +178,32 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600\">Giriş yapıldı (<strong>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600\">Signed in as <strong>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(view.HeaderCtxFrom(ctx).UserEmail)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 62, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 64, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</strong>). Sipariş özeti bu adrese gönderilecek.</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</strong>. Your order confirmation will be sent to this address.</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">İsim</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"first_name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">First name</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"first_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(form.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 69, Col: 158}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 71, Col: 158}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -221,7 +221,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(errs["first_name"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 71, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 73, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -232,14 +232,14 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Soyisim</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"last_name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Last name</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"last_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(form.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 76, Col: 156}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 78, Col: 156}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -257,7 +257,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(errs["last_name"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 78, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 80, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -268,20 +268,20 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Adres</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"address1\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Address</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"address1\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(form.Address1)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 85, Col: 154}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 87, Col: 154}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" placeholder=\"Mahalle, cadde ve kapı no\"> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" placeholder=\"Street, number\"> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -293,7 +293,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(errs["address1"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 87, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 89, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -304,27 +304,27 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Adres (opsiyonel)</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"address2\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Address line 2 (optional)</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"address2\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(form.Address2)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 92, Col: 154}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 95, Col: 154}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" placeholder=\"Daire, blok vb.\"></div><div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Şehir</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"city\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" placeholder=\"Apartment, suite, etc.\"></div><div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">City</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"city\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(form.City)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 98, Col: 147}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 101, Col: 147}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -342,7 +342,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(errs["city"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 100, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 103, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -353,14 +353,14 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Posta Kodu</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"postal_code\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Postal code</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"postal_code\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(form.PostalCode)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 105, Col: 160}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 108, Col: 160}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -378,7 +378,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(errs["postal_code"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 107, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 110, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -389,14 +389,14 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</div></div><div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Ülke</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 uppercase focus:border-indigo-500 focus:outline-hidden\" name=\"country\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</div></div><div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Country</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 uppercase focus:border-indigo-500 focus:outline-hidden\" name=\"country\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(form.Country)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 115, Col: 163}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 118, Col: 163}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -414,7 +414,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(errs["country"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 117, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 120, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -425,14 +425,14 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Telefon</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"phone\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</div><div><label class=\"mb-1 block text-sm font-medium text-gray-700\">Phone</label> <input class=\"w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-indigo-500 focus:outline-hidden\" name=\"phone\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(form.Phone)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 122, Col: 149}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 125, Col: 149}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -450,7 +450,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(errs["phone"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 124, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 127, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
@@ -461,7 +461,7 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div></div></section><section class=\"space-y-4\"><div><p class=\"text-xs font-semibold uppercase tracking-wide text-indigo-600\">2. Teslimat</p><h2 class=\"text-xl font-semibold text-gray-900\">Kargo Seçimi</h2></div><div class=\"space-y-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div></div></section><section class=\"space-y-4\"><div><p class=\"text-xs font-semibold uppercase tracking-wide text-indigo-600\">2. Delivery</p><h2 class=\"text-xl font-semibold text-gray-900\">Shipping method</h2></div><div class=\"space-y-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -473,7 +473,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(o.Code)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 138, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 142, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
@@ -486,7 +486,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(form.ShippingMethod == o.Code)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 138, Col: 107}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 142, Col: 107}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -499,7 +499,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(o.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 140, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 144, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
@@ -512,7 +512,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(o.Price)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 141, Col: 51}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 145, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
@@ -535,7 +535,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(errs["shipping_method"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 147, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 152, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -546,7 +546,7 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</section><section class=\"space-y-4\"><div><p class=\"text-xs font-semibold uppercase tracking-wide text-indigo-600\">3. Ödeme</p><h2 class=\"text-xl font-semibold text-gray-900\">Ödeme Yöntemi</h2><p class=\"text-sm text-gray-500\">Kart, PayPal veya Klarna ile ödeme simüle edilir.</p></div><div class=\"space-y-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</section><section class=\"space-y-4\"><div><p class=\"text-xs font-semibold uppercase tracking-wide text-indigo-600\">3. Payment</p><h2 class=\"text-xl font-semibold text-gray-900\">Payment method</h2><p class=\"text-sm text-gray-500\">Payments are simulated via Card, PayPal, or Klarna.</p></div><div class=\"space-y-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -558,7 +558,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(p.Code)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 160, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 166, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -571,7 +571,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(form.PaymentMethod == p.Code)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 160, Col: 105}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 166, Col: 105}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
@@ -584,7 +584,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(p.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 162, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 168, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
@@ -597,7 +597,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var32 string
 			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 163, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 169, Col: 57}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
@@ -620,7 +620,7 @@ func CheckoutBody(
 			var templ_7745c5c3_Var33 string
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(errs["payment_method"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 169, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 176, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 			if templ_7745c5c3_Err != nil {
@@ -631,25 +631,25 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</section><section class=\"space-y-3 border-t pt-4\"><p class=\"text-sm text-gray-500\">Siparişi onaylayarak satış koşullarını ve gizlilik politikasını kabul etmiş olursunuz.</p><div class=\"flex justify-end\"><button class=\"inline-flex items-center rounded-md bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500\" type=\"submit\">Siparişi Onayla</button></div></section></form><aside class=\"space-y-4\"><div class=\"rounded-xl border border-gray-100 bg-white p-6 shadow-sm\"><div class=\"flex items-center justify-between\"><h2 class=\"text-lg font-semibold text-gray-900\">Sipariş Özeti</h2><span class=\"text-sm text-gray-500\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</section><section class=\"space-y-3 border-t pt-4\"><p class=\"text-sm text-gray-500\">By confirming your order, you agree to the terms of sale and the privacy policy.</p><div class=\"flex justify-end\"><button class=\"inline-flex items-center rounded-md bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500\" type=\"submit\">Confirm order</button></div></section></form><aside class=\"space-y-4\"><div class=\"rounded-xl border border-gray-100 bg-white p-6 shadow-sm\"><div class=\"flex items-center justify-between\"><h2 class=\"text-lg font-semibold text-gray-900\">Order summary</h2><span class=\"text-sm text-gray-500\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(summary.Items)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 187, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 196, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, " ürün</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, " items</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(summary.Lines) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<p class=\"mt-4 text-sm text-gray-500\">Sepetiniz boş. <a href=\"/products\" class=\"font-medium text-indigo-600 hover:text-indigo-500\">Ürünleri keşfedin</a>.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<p class=\"mt-4 text-sm text-gray-500\">Your cart is empty. <a href=\"/products\" class=\"font-medium text-indigo-600 hover:text-indigo-500\">Browse products</a>.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -666,20 +666,20 @@ func CheckoutBody(
 				var templ_7745c5c3_Var35 string
 				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(it.ProductName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 196, Col: 63}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 209, Col: 63}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</p><p class=\"text-xs text-gray-500\">Adet: ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</p><p class=\"text-xs text-gray-500\">Qty: ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(it.Qty)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 197, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 210, Col: 56}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -692,7 +692,7 @@ func CheckoutBody(
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(it.UnitPrice)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 197, Col: 78}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 210, Col: 77}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -705,7 +705,7 @@ func CheckoutBody(
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(it.LineTotal)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 199, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 212, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 				if templ_7745c5c3_Err != nil {
@@ -721,46 +721,46 @@ func CheckoutBody(
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<dl class=\"mt-4 space-y-2 text-sm text-gray-700\"><div class=\"flex items-center justify-between\"><dt>Ara Toplam</dt><dd class=\"font-medium text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<dl class=\"mt-4 space-y-2 text-sm text-gray-700\"><div class=\"flex items-center justify-between\"><dt>Subtotal</dt><dd class=\"font-medium text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(summary.Subtotal)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 208, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 221, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</dd></div><div class=\"flex items-center justify-between\"><dt>Kargo</dt><dd class=\"font-medium text-gray-900\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</dd></div><div class=\"flex items-center justify-between\"><dt>Shipping</dt><dd class=\"font-medium text-gray-900\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var40 string
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(summary.Shipping)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 212, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 225, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</dd></div><div class=\"flex items-center justify-between border-t border-gray-100 pt-2 text-base font-semibold text-gray-900\"><dt>Genel Toplam</dt><dd>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</dd></div><div class=\"flex items-center justify-between border-t border-gray-100 pt-2 text-base font-semibold text-gray-900\"><dt>Total</dt><dd>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var41 string
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(summary.Total)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 216, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/checkout.templ`, Line: 229, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</dd></div></dl><p class=\"mt-3 text-xs text-gray-500\">Ödeme adımı simülasyon amaçlıdır; kart bilgileriniz istenmez.</p></div></aside></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</dd></div></dl><p class=\"mt-3 text-xs text-gray-500\">This checkout is a simulation; you will not be asked for real card details.</p></div></aside></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

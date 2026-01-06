@@ -34,7 +34,7 @@ func Home(flash *view.Flash, h view.HeaderCtx) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = layout.Base("Home", flash, HomeBody(h)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layout.Base("PehliONE", flash, HomeBody(h)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -63,20 +63,95 @@ func HomeBody(h view.HeaderCtx) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"text-2xl font-semibold\">pehlione.com up</h1><p class=\"mt-2\">SSR (templ) çalışıyor.</p><form method=\"post\" action=\"/demo/flash\" class=\"mt-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950\"><section class=\"relative overflow-hidden\"><div class=\"mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8\"><div class=\"grid items-center gap-12 lg:grid-cols-2\"><div class=\"space-y-6\"><p class=\"text-sm font-semibold uppercase tracking-[0.4em] text-amber-400\">pehliONE</p><h1 class=\"text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl\">All collections, one tap away</h1><p class=\"text-lg text-slate-300\">Discover curated picks under one roof—from electronics and fashion to home & living and accessories.</p><div class=\"flex flex-wrap gap-3\"><a href=\"/products\" class=\"inline-flex items-center rounded-full bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-900 shadow-xl shadow-amber-500/30 hover:bg-amber-300\">Explore products</a> <a href=\"/company\" class=\"inline-flex items-center rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-white hover:border-slate-600\">Meet the brand</a></div><div class=\"flex flex-wrap items-center gap-6 text-xs uppercase tracking-wide text-slate-400\"><div><span class=\"text-white\">30+</span> categories</div><div><span class=\"text-white\">Fast</span> shipping</div><div><span class=\"text-white\">Secure</span> checkout</div></div></div><div class=\"relative\"><div class=\"absolute -left-6 top-10 hidden h-64 w-64 rounded-full bg-amber-400/20 blur-3xl lg:block\"></div><div class=\"relative rounded-3xl border border-white/10 bg-white/5 p-1\"><div class=\"rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 shadow-2xl shadow-black/40\"><div class=\"grid gap-6 md:grid-cols-2\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HomeCategoryCard("Electronics", "Minimal design + powerful performance").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HomeCategoryCard("Fashion", "New-season stories").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HomeCategoryCard("Home & Living", "Refresh the mood of your day").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HomeCategoryCard("Accessories", "The finishing touch to your collection").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><p class=\"mt-8 text-center text-xs text-slate-400\">Three curated picks per collection</p></div></div></div></div></div></section><section class=\"border-t border-white/5 bg-slate-950\"><div class=\"mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8\"><div class=\"flex flex-wrap items-center justify-between gap-4\"><div><p class=\"text-lg font-semibold text-white\">Leave a quick message</p><p class=\"text-sm text-slate-400\">The flash message feed is triggered here for demo purposes.</p></div><form method=\"post\" action=\"/demo/flash\" class=\"flex gap-3\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 17, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 65, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"> <button class=\"px-3 py-2 border rounded\" type=\"submit\">Flash Test</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <button class=\"inline-flex items-center rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-white hover:border-slate-500\" type=\"submit\">Send flash test</button></form></div></div></section></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func HomeCategoryCard(title, tagline string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"rounded-2xl border border-white/10 bg-white/5 p-4 text-white\"><p class=\"text-sm font-semibold\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 78, Col: 42}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p><p class=\"mt-1 text-xs text-slate-300\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(tagline)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/home.templ`, Line: 79, Col: 50}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p><div class=\"mt-4 h-12 rounded-xl bg-gradient-to-r from-amber-400/20 to-transparent\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

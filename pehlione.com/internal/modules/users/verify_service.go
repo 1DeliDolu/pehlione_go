@@ -62,15 +62,15 @@ func (s *VerifyService) StartEmailVerification(ctx context.Context, userID, user
 			return err
 		}
 
-		subject := "Pehlione - E-posta doğrulama kodunuz"
-		text := fmt.Sprintf("Doğrulama kodunuz: %s\nBu kod 15 dakika geçerlidir.\n", code)
+		subject := "Pehlione - Your email verification code"
+		text := fmt.Sprintf("Your verification code: %s\nThis code is valid for 15 minutes.\n", code)
 		html := fmt.Sprintf(`
 <html>
   <body style="font-family: Arial, sans-serif;">
-    <h2>E-posta Doğrulama</h2>
-    <p>Doğrulama kodunuz: <b>%s</b></p>
-    <p>Bu kod 15 dakika geçerlidir.</p>
-    <p>Kodu doğrulama sayfasında girin.</p>
+    <h2>Email Verification</h2>
+    <p>Your verification code: <b>%s</b></p>
+    <p>This code is valid for 15 minutes.</p>
+    <p>Enter the code on the verification page.</p>
   </body>
 </html>`, code)
 

@@ -12,13 +12,13 @@ templ Products(flash *view.Flash, h view.HeaderCtx) {
 templ ProductsBody(h view.HeaderCtx) {
 	<div class="bg-white">
 		<div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-			<h2 class="text-2xl font-bold tracking-tight text-gray-900">Ürünlerimiz</h2>
+			<h2 class="text-2xl font-bold tracking-tight text-gray-900">Our products</h2>
 
 			<div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
 				<!-- Product 1 -->
 				<div class="group relative">
-					<div class="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden">
-						<img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop" alt="Premium Wireless Headphones" class="w-full h-full object-cover" />
+					<div class="aspect-square w-full overflow-hidden rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80">
+						<img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop" alt="Premium Wireless Headphones" class="h-full w-full object-cover"/>
 					</div>
 					<div class="mt-4 flex justify-between">
 						<div>
@@ -33,22 +33,19 @@ templ ProductsBody(h view.HeaderCtx) {
 						<p class="text-sm font-medium text-gray-900">$89.99</p>
 					</div>
 					<form method="post" action="/cart/add" class="mt-4 w-full">
-						<input type="hidden" name="csrf_token" value={ h.CSRFToken }>
-						<input type="hidden" name="variant_id" value="var_001">
-						<input type="hidden" name="qty" value="1">
-						<button
-							type="submit"
-							class="w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer"
-						>
-							Sepete Ekle
+						<input type="hidden" name="csrf_token" value={ h.CSRFToken }/>
+						<input type="hidden" name="variant_id" value="var_001"/>
+						<input type="hidden" name="qty" value="1"/>
+						<button type="submit" class="w-full cursor-pointer rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+							Add to cart
 						</button>
 					</form>
 				</div>
 
 				<!-- Product 2 -->
 				<div class="group relative">
-					<div class="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden">
-						<img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop" alt="Luxury Watch" class="w-full h-full object-cover" />
+					<div class="aspect-square w-full overflow-hidden rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80">
+						<img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop" alt="Luxury Chronograph Watch" class="h-full w-full object-cover"/>
 					</div>
 					<div class="mt-4 flex justify-between">
 						<div>
@@ -63,22 +60,19 @@ templ ProductsBody(h view.HeaderCtx) {
 						<p class="text-sm font-medium text-gray-900">$199.99</p>
 					</div>
 					<form method="post" action="/cart/add" class="mt-4 w-full">
-						<input type="hidden" name="csrf_token" value={ h.CSRFToken }>
-						<input type="hidden" name="variant_id" value="var_002">
-						<input type="hidden" name="qty" value="1">
-						<button
-							type="submit"
-							class="w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer"
-						>
-							Sepete Ekle
+						<input type="hidden" name="csrf_token" value={ h.CSRFToken }/>
+						<input type="hidden" name="variant_id" value="var_002"/>
+						<input type="hidden" name="qty" value="1"/>
+						<button type="submit" class="w-full cursor-pointer rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+							Add to cart
 						</button>
 					</form>
 				</div>
 
 				<!-- Product 3 -->
 				<div class="group relative">
-					<div class="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden">
-						<img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&h=500&fit=crop" alt="Designer Sunglasses" class="w-full h-full object-cover" />
+					<div class="aspect-square w-full overflow-hidden rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80">
+						<img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&h=500&fit=crop" alt="Designer Sunglasses" class="h-full w-full object-cover"/>
 					</div>
 					<div class="mt-4 flex justify-between">
 						<div>
@@ -93,22 +87,19 @@ templ ProductsBody(h view.HeaderCtx) {
 						<p class="text-sm font-medium text-gray-900">$149.99</p>
 					</div>
 					<form method="post" action="/cart/add" class="mt-4 w-full">
-						<input type="hidden" name="csrf_token" value={ h.CSRFToken }>
-						<input type="hidden" name="variant_id" value="var_003">
-						<input type="hidden" name="qty" value="1">
-						<button
-							type="submit"
-							class="w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer"
-						>
-							Sepete Ekle
+						<input type="hidden" name="csrf_token" value={ h.CSRFToken }/>
+						<input type="hidden" name="variant_id" value="var_003"/>
+						<input type="hidden" name="qty" value="1"/>
+						<button type="submit" class="w-full cursor-pointer rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+							Add to cart
 						</button>
 					</form>
 				</div>
 
 				<!-- Product 4 -->
 				<div class="group relative">
-					<div class="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80 overflow-hidden">
-						<img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=500&h=500&fit=crop" alt="Premium Sneakers" class="w-full h-full object-cover" />
+					<div class="aspect-square w-full overflow-hidden rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80">
+						<img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=500&h=500&fit=crop" alt="Premium Sneakers" class="h-full w-full object-cover"/>
 					</div>
 					<div class="mt-4 flex justify-between">
 						<div>
@@ -123,14 +114,11 @@ templ ProductsBody(h view.HeaderCtx) {
 						<p class="text-sm font-medium text-gray-900">$119.99</p>
 					</div>
 					<form method="post" action="/cart/add" class="mt-4 w-full">
-						<input type="hidden" name="csrf_token" value={ h.CSRFToken }>
-						<input type="hidden" name="variant_id" value="var_004">
-						<input type="hidden" name="qty" value="1">
-						<button
-							type="submit"
-							class="w-full px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition cursor-pointer"
-						>
-							Sepete Ekle
+						<input type="hidden" name="csrf_token" value={ h.CSRFToken }/>
+						<input type="hidden" name="variant_id" value="var_004"/>
+						<input type="hidden" name="qty" value="1"/>
+						<button type="submit" class="w-full cursor-pointer rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+							Add to cart
 						</button>
 					</form>
 				</div>

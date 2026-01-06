@@ -10,39 +10,47 @@ templ Cart(flash *view.Flash, p view.CartPage) {
 }
 
 templ CartBody(p view.CartPage) {
-	<div class="max-w-4xl mx-auto px-4 py-8">
-		<h1 class="text-3xl font-bold mb-8">Sepet</h1>
-		
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+	<div class="mx-auto max-w-4xl px-4 py-8">
+		<h1 class="mb-8 text-3xl font-bold">Cart</h1>
+
+		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 			<!-- Cart Items -->
 			<div class="lg:col-span-2">
-				<div class="border rounded-lg p-6">
+				<div class="rounded-lg border p-6">
 					if len(p.Items) == 0 {
-						<p class="text-gray-600 text-center py-12">
-							Sepet boş. <a href="/products" class="text-indigo-600 hover:text-indigo-700 font-semibold">Alışverişe devam edin</a>
+						<p class="py-12 text-center text-gray-600">
+							Your cart is empty. <a href="/products" class="font-semibold text-indigo-600 hover:text-indigo-700">Continue shopping</a>
 						</p>
 					} else {
 						<div class="space-y-4">
 							for _, it := range p.Items {
 								<div class="flex items-center gap-4 border-b pb-4">
 									if it.ImageURL != "" {
-										<img class="h-20 w-20 rounded object-cover" src={ it.ImageURL } alt={ it.ProductName } />
+										<img class="h-20 w-20 rounded object-cover" src={ it.ImageURL } alt={ it.ProductName } loading="lazy" decoding="async"/>
 									}
 
 									<div class="flex-1">
-										<a href={ "/products/" + it.ProductSlug } class="font-semibold text-lg hover:text-indigo-600">{ it.ProductName }</a>
-										<p class="text-gray-600 text-sm">{ it.VariantID }</p>
-										<p class="text-gray-700 font-semibold mt-2">{ it.UnitPrice }</p>
+										<a href={ "/products/" + it.ProductSlug } class="text-lg font-semibold hover:text-indigo-600">{ it.ProductName }</a>
+										<p class="text-sm text-gray-600">{ it.VariantID }</p>
+										<p class="mt-2 font-semibold text-gray-700">{ it.UnitPrice }</p>
 									</div>
 
-									<div class="flex items-center gap-4 text-right">
-										<div>
-											<div class="text-sm text-gray-600">Miktar: { it.Qty }</div>
-											<div class="font-semibold text-lg">{ it.LineTotal }</div>
-										</div>
-										<button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
-											Kaldır
-										</button>
+									<div class="flex flex-col items-end gap-2 text-right">
+										<form method="post" action="/cart/items/update" class="flex items-center gap-2 text-sm text-gray-600">
+											<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+											<input type="hidden" name="variant_id" value={ it.VariantID }/>
+											<label class="text-gray-600">Qty:</label>
+											<input type="number" name="qty" min="1" max="99" value={ it.Qty } class="w-16 rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:outline-hidden"/>
+											<button type="submit" class="rounded border border-gray-300 px-2 py-1 text-sm text-gray-700 hover:border-gray-400 hover:text-gray-900">Update</button>
+										</form>
+										<div class="text-lg font-semibold">{ it.LineTotal }</div>
+										<form method="post" action="/cart/items/remove">
+											<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+											<input type="hidden" name="variant_id" value={ it.VariantID }/>
+											<button type="submit" class="rounded bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600">
+												Remove
+											</button>
+										</form>
 									</div>
 								</div>
 							}
@@ -53,41 +61,41 @@ templ CartBody(p view.CartPage) {
 
 			<!-- Cart Summary -->
 			<div class="lg:col-span-1">
-				<div class="border rounded-lg p-6 sticky top-6">
-					<h2 class="text-xl font-semibold mb-4">Sipariş Özeti</h2>
-					
-					<div class="space-y-3 mb-6 pb-6 border-b">
+				<div class="sticky top-6 rounded-lg border p-6">
+					<h2 class="mb-4 text-xl font-semibold">Order summary</h2>
+
+					<div class="mb-6 space-y-3 border-b pb-6">
 						<div class="flex justify-between text-gray-700">
-							<span>Ara Toplam</span>
+							<span>Subtotal</span>
 							<span>{ p.Subtotal }</span>
 						</div>
 						<div class="flex justify-between text-gray-700">
-							<span>Kargo</span>
+							<span>Shipping</span>
 							<span>$0.00</span>
 						</div>
 						<div class="flex justify-between text-gray-700">
-							<span>KDV</span>
+							<span>Tax</span>
 							<span>$0.00</span>
 						</div>
 					</div>
 
-					<div class="flex justify-between text-lg font-semibold mb-6">
-						<span>Toplam</span>
+					<div class="mb-6 flex justify-between text-lg font-semibold">
+						<span>Total</span>
 						<span>{ p.Total }</span>
 					</div>
 
 					if len(p.Items) > 0 {
-						<a href="/checkout" class="block w-full px-4 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition font-semibold text-center">
-							Ödemeye Geç
+						<a href="/checkout" class="block w-full rounded bg-indigo-600 px-4 py-3 text-center font-semibold text-white transition hover:bg-indigo-700">
+							Proceed to checkout
 						</a>
 					} else {
-						<button disabled class="w-full px-4 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-semibold">
-							Ödemeye Geç
+						<button disabled class="w-full rounded bg-indigo-600 px-4 py-3 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50">
+							Proceed to checkout
 						</button>
 					}
 
-					<a href="/products" class="block text-center mt-4 text-indigo-600 hover:text-indigo-700 font-semibold">
-						Alışverişe Devam Et
+					<a href="/products" class="mt-4 block text-center font-semibold text-indigo-600 hover:text-indigo-700">
+						Continue shopping
 					</a>
 				</div>
 			</div>

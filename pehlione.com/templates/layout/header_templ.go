@@ -35,7 +35,7 @@ func Header() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Mobile menu --><el-dialog><dialog id=\"mobile-menu\" class=\"backdrop:bg-transparent lg:hidden\"><el-dialog-backdrop class=\"fixed inset-0 bg-black/25 transition-opacity duration-300 ease-linear data-closed:opacity-0\"></el-dialog-backdrop><div tabindex=\"0\" class=\"fixed inset-0 flex focus:outline-none\"><el-dialog-panel class=\"relative flex w-full max-w-xs transform flex-col overflow-y-auto bg-white pb-12 shadow-xl transition duration-300 ease-in-out data-closed:-translate-x-full\"><div class=\"flex px-4 pt-5 pb-2\"><button type=\"button\" command=\"close\" commandfor=\"mobile-menu\" class=\"relative -m-2 inline-flex items-center justify-center rounded-md p-2 text-gray-400\"><span class=\"absolute -inset-0.5\"></span> <span class=\"sr-only\">Menüyü kapat</span> <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" data-slot=\"icon\" aria-hidden=\"true\" class=\"size-6\"><path d=\"M6 18 18 6M6 6l12 12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></button></div><!-- Mobile menu content --><div class=\"mt-2\"><div class=\"space-y-6 border-t border-gray-200 px-4 py-6\"><div class=\"flow-root\"><a href=\"/products\" class=\"-m-2 block p-2 font-medium text-gray-900\">Ürünler</a></div><div class=\"flow-root\"><button type=\"button\" command=\"show-modal\" commandfor=\"cart-drawer\" class=\"-m-2 flex w-full items-center justify-between p-2 font-medium text-gray-900\"><span>Sepet</span> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Mobile menu --><el-dialog><dialog id=\"mobile-menu\" class=\"backdrop:bg-transparent lg:hidden\"><el-dialog-backdrop class=\"fixed inset-0 bg-black/25 transition-opacity duration-300 ease-linear data-closed:opacity-0\"></el-dialog-backdrop><div tabindex=\"0\" class=\"fixed inset-0 flex focus:outline-none\"><el-dialog-panel class=\"relative flex w-full max-w-xs transform flex-col overflow-y-auto bg-white pb-12 shadow-xl transition duration-300 ease-in-out data-closed:-translate-x-full\"><div class=\"flex px-4 pt-5 pb-2\"><button type=\"button\" command=\"close\" commandfor=\"mobile-menu\" class=\"relative -m-2 inline-flex items-center justify-center rounded-md p-2 text-gray-400\"><span class=\"absolute -inset-0.5\"></span> <span class=\"sr-only\">Close menu</span> <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" data-slot=\"icon\" aria-hidden=\"true\" class=\"size-6\"><path d=\"M6 18 18 6M6 6l12 12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></button></div><!-- Mobile menu content --><div class=\"mt-2\"><div class=\"space-y-6 border-t border-gray-200 px-4 py-6\"><div class=\"flow-root\"><a href=\"/products\" class=\"-m-2 block p-2 font-medium text-gray-900\">Products</a></div><div class=\"flow-root\"><button type=\"button\" command=\"show-modal\" commandfor=\"cart-drawer\" class=\"-m-2 flex w-full items-center justify-between p-2 font-medium text-gray-900\"><span>Cart</span> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -58,7 +58,7 @@ func Header() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</button></div><div class=\"flow-root\"><a href=\"/company\" class=\"-m-2 block p-2 font-medium text-gray-900\">Hakkımızda</a></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</button></div><div class=\"flow-root\"><a href=\"/company\" class=\"-m-2 block p-2 font-medium text-gray-900\">About</a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -73,12 +73,12 @@ func Header() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if h := view.HeaderCtxFrom(ctx); !h.IsAuthed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"flow-root\"><a href=\"/login\" class=\"-m-2 block p-2 font-medium text-gray-900\">Giriş Yap</a></div><div class=\"flow-root\"><a href=\"/signup\" class=\"-m-2 block p-2 font-medium text-gray-900\">Hesap Oluştur</a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"flow-root\"><a href=\"/login\" class=\"-m-2 block p-2 font-medium text-gray-900\">Sign in</a></div><div class=\"flow-root\"><a href=\"/signup\" class=\"-m-2 block p-2 font-medium text-gray-900\">Create account</a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flow-root\"><a href=\"/account/orders\" class=\"-m-2 block p-2 font-medium text-gray-900\">Hesabım</a></div><div class=\"flow-root\"><form method=\"post\" action=\"/logout\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"flow-root\"><a href=\"/account/orders\" class=\"-m-2 block p-2 font-medium text-gray-900\">My account</a></div><div class=\"flow-root\"><form method=\"post\" action=\"/logout\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -91,12 +91,12 @@ func Header() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"> <button type=\"submit\" class=\"-m-2 block w-full p-2 text-left font-medium text-gray-900\">Çıkış Yap</button></form></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"> <button type=\"submit\" class=\"-m-2 block w-full p-2 text-left font-medium text-gray-900\">Sign out</button></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></el-dialog-panel></div></dialog></el-dialog><header class=\"relative bg-white\"><p class=\"flex h-10 items-center justify-center bg-indigo-600 px-4 text-sm font-medium text-white sm:px-6 lg:px-8\">100₺ üzeri siparişlerde ücretsiz kargo</p><nav aria-label=\"Top\" class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><div class=\"border-b border-gray-200\"><div class=\"flex h-16 items-center\"><button type=\"button\" command=\"show-modal\" commandfor=\"mobile-menu\" class=\"relative rounded-md bg-white p-2 text-gray-400 lg:hidden\"><span class=\"absolute -inset-0.5\"></span> <span class=\"sr-only\">Menüyü aç</span> <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" data-slot=\"icon\" aria-hidden=\"true\" class=\"size-6\"><path d=\"M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></button><!-- Logo --><div class=\"ml-4 flex lg:ml-0\"><a href=\"/\"><span class=\"sr-only\">Pehlione</span> <img src=\"https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600\" alt=\"\" class=\"h-8 w-auto\"></a></div><!-- Desktop menu --><el-popover-group class=\"group/popover-group hidden lg:ml-8 lg:block lg:self-stretch\"><div class=\"flex h-full space-x-8\"><div class=\"group/popover flex\"><div class=\"relative flex\"><button popovertarget=\"desktop-menu-products\" class=\"relative flex items-center justify-center text-sm font-medium transition-colors duration-200 ease-out group-not-has-open/popover:text-gray-700 group-has-open/popover:text-indigo-600 group-not-has-open/popover:hover:text-gray-800\">Ürünler <span aria-hidden=\"true\" class=\"absolute inset-x-0 -bottom-px z-30 h-0.5 bg-transparent duration-200 ease-in group-has-open/popover:bg-indigo-600 group-has-open/popover-group:duration-150 group-has-open/popover-group:ease-out\"></span></button></div><el-popover id=\"desktop-menu-products\" anchor=\"bottom\" popover class=\"fixed left-0 right-0 overflow-visible bg-white text-sm text-gray-500 transition transition-discrete [--anchor-gap:0px] backdrop:bg-transparent open:block data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in [z-index:1] shadow-lg\"><div aria-hidden=\"true\" class=\"absolute inset-0 top-1/2 bg-white shadow-sm\"></div><div class=\"relative bg-white\"><div class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><div class=\"grid grid-cols-2 gap-x-8 gap-y-10 py-16\"><div class=\"col-start-2 grid grid-cols-2 gap-x-8\"><div class=\"group relative text-base sm:text-sm\"><div class=\"aspect-square w-full rounded-lg bg-gradient-to-br from-yellow-300 to-yellow-400 p-8 group-hover:opacity-90 transition-opacity flex items-center justify-center\"><img src=\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop\" alt=\"Premium Wireless Headphones\" class=\"w-full h-full object-contain drop-shadow-2xl\"></div><a href=\"/products?sort=new\" class=\"mt-6 block font-medium text-gray-900\"><span aria-hidden=\"true\" class=\"absolute inset-0 z-10\"></span> Yeni Ürünler</a><p aria-hidden=\"true\" class=\"mt-1\">Hemen keşfet</p></div><div class=\"group relative text-base sm:text-sm\"><div class=\"aspect-square w-full rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-8 group-hover:opacity-90 transition-opacity flex items-center justify-center\"><img src=\"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop\" alt=\"Luxury Chronograph Watch\" class=\"w-full h-full object-contain drop-shadow-xl\"></div><a href=\"/products?sort=popular\" class=\"mt-6 block font-medium text-gray-900\"><span aria-hidden=\"true\" class=\"absolute inset-0 z-10\"></span> Popüler Ürünler</a><p aria-hidden=\"true\" class=\"mt-1\">En çok satanlar</p></div></div><div class=\"row-start-1 grid grid-cols-2 gap-x-8 gap-y-10 text-sm\"><div><p class=\"font-medium text-gray-900\">Kategoriler</p><ul role=\"list\" class=\"mt-6 space-y-6 sm:mt-4 sm:space-y-4\"><li class=\"flex\"><a href=\"/products\" class=\"hover:text-gray-800\">Tüm Ürünler</a></li><li class=\"flex\"><a href=\"/products?category=electronics\" class=\"hover:text-gray-800\">Elektronik</a></li><li class=\"flex\"><a href=\"/products?category=fashion\" class=\"hover:text-gray-800\">Moda</a></li><li class=\"flex\"><a href=\"/products?category=home\" class=\"hover:text-gray-800\">Ev & Yaşam</a></li></ul></div><div><p class=\"font-medium text-gray-900\">Özel Koleksiyonlar</p><ul role=\"list\" class=\"mt-6 space-y-6 sm:mt-4 sm:space-y-4\"><li class=\"flex\"><a href=\"/products?filter=sale\" class=\"hover:text-gray-800\">İndirimli Ürünler</a></li><li class=\"flex\"><a href=\"/products?filter=featured\" class=\"hover:text-gray-800\">Öne Çıkanlar</a></li></ul></div></div></div></div></div></el-popover></div><a href=\"/company\" class=\"flex items-center text-sm font-medium text-gray-700 hover:text-gray-800\">Hakkımızda</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></el-dialog-panel></div></dialog></el-dialog><header class=\"relative bg-white\"><p class=\"flex h-10 items-center justify-center bg-indigo-600 px-4 text-sm font-medium text-white sm:px-6 lg:px-8\">Free shipping on orders over 100₺</p><nav aria-label=\"Top\" class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><div class=\"border-b border-gray-200\"><div class=\"flex h-16 items-center\"><button type=\"button\" command=\"show-modal\" commandfor=\"mobile-menu\" class=\"relative rounded-md bg-white p-2 text-gray-400 lg:hidden\"><span class=\"absolute -inset-0.5\"></span> <span class=\"sr-only\">Open menu</span> <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" data-slot=\"icon\" aria-hidden=\"true\" class=\"size-6\"><path d=\"M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></button><!-- Logo --><div class=\"ml-4 flex items-center gap-2 lg:ml-0\"><a href=\"/\" class=\"flex items-center gap-3\"><span class=\"sr-only\">pehliONE</span> <img src=\"https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600\" alt=\"\" class=\"h-8 w-auto\"> <span class=\"hidden text-xl font-bold tracking-wider sm:inline-flex\"><span class=\"text-yellow-400\">Pehli</span><span class=\"text-orange-500\">ONE</span></span></a></div><!-- Desktop menu --><el-popover-group class=\"group/popover-group hidden lg:ml-8 lg:block lg:self-stretch\"><div class=\"flex h-full space-x-8\"><div class=\"group/popover flex\"><div class=\"relative flex\"><button popovertarget=\"desktop-menu-products\" class=\"relative flex items-center justify-center text-sm font-medium transition-colors duration-200 ease-out group-not-has-open/popover:text-gray-700 group-has-open/popover:text-indigo-600 group-not-has-open/popover:hover:text-gray-800\">Products <span aria-hidden=\"true\" class=\"absolute inset-x-0 -bottom-px z-30 h-0.5 bg-transparent duration-200 ease-in group-has-open/popover:bg-indigo-600 group-has-open/popover-group:duration-150 group-has-open/popover-group:ease-out\"></span></button></div><el-popover id=\"desktop-menu-products\" anchor=\"bottom\" popover class=\"fixed left-0 right-0 overflow-visible bg-white text-sm text-gray-500 transition transition-discrete [--anchor-gap:0px] backdrop:bg-transparent open:block data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in [z-index:1] shadow-lg\"><div aria-hidden=\"true\" class=\"absolute inset-0 top-1/2 bg-white shadow-sm\"></div><div class=\"relative bg-white\"><div class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><div class=\"grid grid-cols-2 gap-x-8 gap-y-10 py-16\"><div class=\"col-start-2 grid grid-cols-2 gap-x-8\"><div class=\"group relative text-base sm:text-sm\"><div class=\"flex aspect-square w-full items-center justify-center rounded-lg bg-gradient-to-br from-yellow-300 to-yellow-400 p-8 transition-opacity group-hover:opacity-90\"><img src=\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop\" alt=\"Premium Wireless Headphones\" class=\"h-full w-full object-contain drop-shadow-2xl\"></div><a href=\"/products?sort=new\" class=\"mt-6 block font-medium text-gray-900\"><span aria-hidden=\"true\" class=\"absolute inset-0 z-10\"></span> New arrivals</a><p aria-hidden=\"true\" class=\"mt-1\">Shop now</p></div><div class=\"group relative text-base sm:text-sm\"><div class=\"flex aspect-square w-full items-center justify-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 p-8 transition-opacity group-hover:opacity-90\"><img src=\"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop\" alt=\"Luxury Chronograph Watch\" class=\"h-full w-full object-contain drop-shadow-xl\"></div><a href=\"/products?sort=popular\" class=\"mt-6 block font-medium text-gray-900\"><span aria-hidden=\"true\" class=\"absolute inset-0 z-10\"></span> Popular</a><p aria-hidden=\"true\" class=\"mt-1\">Best sellers</p></div></div><div class=\"row-start-1 grid grid-cols-2 gap-x-8 gap-y-10 text-sm\"><div><p class=\"font-medium text-gray-900\">Categories</p><ul role=\"list\" class=\"mt-6 space-y-6 sm:mt-4 sm:space-y-4\"><li class=\"flex\"><a href=\"/products\" class=\"hover:text-gray-800\">All products</a></li><li class=\"flex\"><a href=\"/products?category=electronics\" class=\"hover:text-gray-800\">Electronics</a></li><li class=\"flex\"><a href=\"/products?category=fashion\" class=\"hover:text-gray-800\">Fashion</a></li><li class=\"flex\"><a href=\"/products?category=home\" class=\"hover:text-gray-800\">Home & Living</a></li></ul></div><div><p class=\"font-medium text-gray-900\">Collections</p><ul role=\"list\" class=\"mt-6 space-y-6 sm:mt-4 sm:space-y-4\"><li class=\"flex\"><a href=\"/products?filter=sale\" class=\"hover:text-gray-800\">On sale</a></li><li class=\"flex\"><a href=\"/products?filter=featured\" class=\"hover:text-gray-800\">Featured</a></li></ul></div></div></div></div></div></el-popover></div><a href=\"/company\" class=\"flex items-center text-sm font-medium text-gray-700 hover:text-gray-800\">About</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -111,25 +111,25 @@ func Header() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if h := view.HeaderCtxFrom(ctx); !h.IsAuthed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<a href=\"/login\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">Giriş Yap</a> <span aria-hidden=\"true\" class=\"h-6 w-px bg-gray-200\"></span> <a href=\"/signup\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">Hesap Oluştur</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<a href=\"/login\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">Sign in</a> <span aria-hidden=\"true\" class=\"h-6 w-px bg-gray-200\"></span> <a href=\"/signup\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">Create account</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<a href=\"/account/orders\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">Hesabım</a> <span aria-hidden=\"true\" class=\"h-6 w-px bg-gray-200\"></span><form method=\"post\" action=\"/logout\" class=\"inline\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<a href=\"/account/orders\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">My account</a> <span aria-hidden=\"true\" class=\"h-6 w-px bg-gray-200\"></span><form method=\"post\" action=\"/logout\" class=\"inline\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(h.CSRFToken)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 190, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 199, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"> <button type=\"submit\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">Çıkış Yap</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"> <button type=\"submit\" class=\"text-sm font-medium text-gray-700 hover:text-gray-800\">Sign out</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -146,7 +146,7 @@ func Header() templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(h.CartQty))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 203, Col: 129}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 214, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -162,7 +162,7 @@ func Header() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<span class=\"sr-only\">sepetteki ürünler</span></button></div></div></div></div></nav></header><!-- Cart Drawer --><el-dialog><dialog id=\"cart-drawer\" aria-labelledby=\"cart-drawer-title\" class=\"fixed inset-0 size-auto max-h-none max-w-none overflow-hidden bg-transparent not-open:hidden backdrop:bg-transparent\"><el-dialog-backdrop class=\"absolute inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0\"></el-dialog-backdrop><div tabindex=\"0\" class=\"absolute inset-0 pl-10 focus:outline-none sm:pl-16\"><el-dialog-panel class=\"ml-auto block size-full max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700\"><div class=\"flex h-full flex-col overflow-y-auto bg-white shadow-xl\"><div class=\"flex-1 overflow-y-auto px-4 py-6 sm:px-6\"><div class=\"flex items-start justify-between\"><h2 id=\"cart-drawer-title\" class=\"text-lg font-medium text-gray-900\">Sepetim</h2><div class=\"ml-3 flex h-7 items-center\"><button type=\"button\" command=\"close\" commandfor=\"cart-drawer\" class=\"relative -m-2 p-2 text-gray-400 hover:text-gray-500\"><span class=\"absolute -inset-0.5\"></span> <span class=\"sr-only\">Kapat</span> <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" data-slot=\"icon\" aria-hidden=\"true\" class=\"size-6\"><path d=\"M6 18 18 6M6 6l12 12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></button></div></div><div class=\"mt-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<span class=\"sr-only\">items in cart</span></button></div></div></div></div></nav></header><!-- Cart Drawer --><el-dialog><dialog id=\"cart-drawer\" aria-labelledby=\"cart-drawer-title\" class=\"fixed inset-0 size-auto max-h-none max-w-none overflow-hidden bg-transparent not-open:hidden backdrop:bg-transparent\"><el-dialog-backdrop class=\"absolute inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0\"></el-dialog-backdrop><div tabindex=\"0\" class=\"absolute inset-0 pl-10 focus:outline-none sm:pl-16\"><el-dialog-panel class=\"ml-auto block size-full max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700\"><div class=\"flex h-full flex-col overflow-y-auto bg-white shadow-xl\"><div class=\"flex-1 overflow-y-auto px-4 py-6 sm:px-6\"><div class=\"flex items-start justify-between\"><h2 id=\"cart-drawer-title\" class=\"text-lg font-medium text-gray-900\">My cart</h2><div class=\"ml-3 flex h-7 items-center\"><button type=\"button\" command=\"close\" commandfor=\"cart-drawer\" class=\"relative -m-2 p-2 text-gray-400 hover:text-gray-500\"><span class=\"absolute -inset-0.5\"></span> <span class=\"sr-only\">Close</span> <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" data-slot=\"icon\" aria-hidden=\"true\" class=\"size-6\"><path d=\"M6 18 18 6M6 6l12 12\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></button></div></div><div class=\"mt-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -170,7 +170,7 @@ func Header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div><div class=\"border-t border-gray-200 px-4 py-6 sm:px-6\"><div class=\"flex justify-between text-base font-medium text-gray-900\"><p>Toplam</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div><div class=\"border-t border-gray-200 px-4 py-6 sm:px-6\"><div class=\"flex justify-between text-base font-medium text-gray-900\"><p>Total</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -182,7 +182,7 @@ func Header() templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(h.Cart.Total)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 247, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 260, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -198,7 +198,7 @@ func Header() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><p class=\"mt-0.5 text-sm text-gray-500\">Kargo ve vergiler ödeme sırasında hesaplanacaktır.</p><div class=\"mt-6\"><a href=\"/checkout\" class=\"flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700\">Ödemeye Geç</a></div><div class=\"mt-6 flex justify-center text-center text-sm text-gray-500\"><p>ya da <button type=\"button\" command=\"close\" commandfor=\"cart-drawer\" class=\"font-medium text-indigo-600 hover:text-indigo-500\">Alışverişe Devam Et <span aria-hidden=\"true\">&rarr;</span></button></p></div></div></div></el-dialog-panel></div></dialog></el-dialog>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><p class=\"mt-0.5 text-sm text-gray-500\">Shipping and taxes will be calculated at checkout.</p><div class=\"mt-6\"><a href=\"/checkout\" class=\"flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700\">Proceed to checkout</a></div><div class=\"mt-6 flex justify-center text-center text-sm text-gray-500\"><p>or <button type=\"button\" command=\"close\" commandfor=\"cart-drawer\" class=\"font-medium text-indigo-600 hover:text-indigo-500\">Continue shopping <span aria-hidden=\"true\">&rarr;</span></button></p></div></div></div></el-dialog-panel></div></dialog></el-dialog>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -233,7 +233,7 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if len(h.Cart.Items) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div id=\"empty-cart-message\" class=\"py-12\"><p class=\"text-center text-sm text-gray-500\">Sepetiniz boş. Ürün eklemek için <a href=\"/products\" class=\"font-medium text-indigo-600 hover:text-indigo-500\">ürünleri inceleyin</a>.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div id=\"empty-cart-message\" class=\"py-12\"><p class=\"text-center text-sm text-gray-500\">Your cart is empty. To add items, <a href=\"/products\" class=\"font-medium text-indigo-600 hover:text-indigo-500\">browse products</a>.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -255,7 +255,7 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(it.ImageURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 288, Col: 29}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 303, Col: 29}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
@@ -268,13 +268,13 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(it.ProductName)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 288, Col: 52}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 303, Col: 52}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" class=\"size-24 flex-none rounded-md object-cover\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" loading=\"lazy\" decoding=\"async\" class=\"size-24 flex-none rounded-md object-cover\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -291,7 +291,7 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 				var templ_7745c5c3_Var10 templ.SafeURL
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs("/products/" + it.ProductSlug)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 295, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 311, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -304,7 +304,7 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(it.ProductName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 295, Col: 97}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 311, Col: 97}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -317,7 +317,7 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(it.LineTotal)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 297, Col: 56}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 313, Col: 56}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -330,20 +330,20 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(it.VariantID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 299, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 316, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</p><div class=\"mt-2 flex items-end justify-between text-sm\"><p class=\"text-gray-500\">Miktar: ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</p><div class=\"mt-2 flex items-end justify-between text-sm\"><p class=\"text-gray-500\">Quantity: ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(it.Qty)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 301, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 319, Col: 51}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -356,7 +356,7 @@ func CartDrawerContent(h view.HeaderCtx) templ.Component {
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(it.UnitPrice)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 302, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/header.templ`, Line: 320, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {

@@ -63,7 +63,7 @@ func OrderPayBody(csrf string, orderID string, total string, idemKey string) tem
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"text-2xl font-semibold mb-4\">Ödeme</h1><div class=\"border rounded p-3 mb-4\"><div><strong>Order:</strong> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"mb-4 text-2xl font-semibold\">Payment</h1><div class=\"mb-4 rounded border p-3\"><div><strong>Order:</strong> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -128,7 +128,7 @@ func OrderPayBody(csrf string, orderID string, total string, idemKey string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"> <button class=\"px-4 py-2 border rounded\" type=\"submit\">Mock Pay (Successful)</button></form><div class=\"mt-6\"><a class=\"underline\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"> <button class=\"rounded border px-4 py-2\" type=\"submit\">Mock Pay (Successful)</button></form><div class=\"mt-6\"><a class=\"underline\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -141,7 +141,7 @@ func OrderPayBody(csrf string, orderID string, total string, idemKey string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">Siparişe dön</a></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">Back to order</a></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

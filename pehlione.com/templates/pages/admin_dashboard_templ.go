@@ -63,33 +63,33 @@ func AdminDashboardBody(csrf string, email string) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"text-2xl font-semibold\">Admin Panel</h1><div class=\"mt-3 p-3 border rounded\"><div><strong>Admin:</strong> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"text-2xl font-semibold\">Admin Dashboard</h1><div class=\"mt-3 rounded border p-3\"><div><strong>Admin:</strong> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_dashboard.templ`, Line: 16, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_dashboard.templ`, Line: 16, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div></div><div class=\"mt-4 space-y-2\"><div><a class=\"underline\" href=\"/admin/products\">Ürünler</a></div><div><a class=\"underline\" href=\"/admin/orders\">Siparişler</a></div><div><a class=\"underline\" href=\"/admin/coupons\">Kuponlar</a></div></div><form method=\"post\" action=\"/logout\" class=\"mt-6\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div></div><div class=\"mt-4 space-y-2\"><div><a class=\"underline\" href=\"/admin/products\">Products</a></div><div><a class=\"underline\" href=\"/admin/orders\">Orders</a></div><div><a class=\"underline\" href=\"/admin/coupons\">Coupons</a></div></div><form method=\"post\" action=\"/logout\" class=\"mt-6\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_dashboard.templ`, Line: 26, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_dashboard.templ`, Line: 26, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <button class=\"px-4 py-2 border rounded\" type=\"submit\">Çıkış Yap</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"> <button class=\"rounded border px-4 py-2\" type=\"submit\">Sign out</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

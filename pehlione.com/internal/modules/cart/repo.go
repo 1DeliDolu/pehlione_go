@@ -59,10 +59,13 @@ func (r *Repo) AddItem(ctx context.Context, cartID string, variantID string, qty
 	if err == nil {
 		// Item exists, increment quantity
 		newQty := existing.Quantity + qty
-		return r.db.WithContext(ctx).
+		if err := r.db.WithContext(ctx).
 			Model(&CartItem{}).
 			Where("cart_id = ? AND variant_id = ?", cartID, variantID).
-			Update("quantity", newQty).Error
+			Update("quantity", newQty).Error; err != nil {
+			return err
+		}
+		return r.touchCart(ctx, cartID)
 	}
 
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -76,24 +79,43 @@ func (r *Repo) AddItem(ctx context.Context, cartID string, variantID string, qty
 		VariantID: variantID,
 		Quantity:  qty,
 	}
-	return r.db.WithContext(ctx).Create(&item).Error
+	if err := r.db.WithContext(ctx).Create(&item).Error; err != nil {
+		return err
+	}
+	return r.touchCart(ctx, cartID)
 }
 
 func (r *Repo) UpdateItemQty(ctx context.Context, cartID string, variantID string, qty int) error {
 	if qty <= 0 {
-		return r.db.WithContext(ctx).Where("cart_id = ? AND variant_id = ?", cartID, variantID).Delete(&CartItem{}).Error
+		if err := r.db.WithContext(ctx).Where("cart_id = ? AND variant_id = ?", cartID, variantID).Delete(&CartItem{}).Error; err != nil {
+			return err
+		}
+		return r.touchCart(ctx, cartID)
 	}
-	return r.db.WithContext(ctx).
+	if err := r.db.WithContext(ctx).
 		Where("cart_id = ? AND variant_id = ?", cartID, variantID).
-		Update("quantity", qty).Error
+		Update("quantity", qty).Error; err != nil {
+		return err
+	}
+	return r.touchCart(ctx, cartID)
 }
 
 func (r *Repo) RemoveItem(ctx context.Context, cartID string, variantID string) error {
-	return r.db.WithContext(ctx).
+	if err := r.db.WithContext(ctx).
 		Where("cart_id = ? AND variant_id = ?", cartID, variantID).
-		Delete(&CartItem{}).Error
+		Delete(&CartItem{}).Error; err != nil {
+		return err
+	}
+	return r.touchCart(ctx, cartID)
 }
 
 func (r *Repo) ClearCart(ctx context.Context, cartID string) error {
 	return r.db.WithContext(ctx).Where("cart_id = ?", cartID).Delete(&CartItem{}).Error
+}
+
+func (r *Repo) touchCart(ctx context.Context, cartID string) error {
+	return r.db.WithContext(ctx).
+		Model(&Cart{}).
+		Where("id = ?", cartID).
+		UpdateColumn("updated_at", gorm.Expr("CURRENT_TIMESTAMP(3)")).Error
 }

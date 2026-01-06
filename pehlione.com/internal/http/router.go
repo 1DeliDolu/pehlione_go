@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ import (
 	adminHandlers "pehlione.com/app/internal/http/handlers/admin"
 	"pehlione.com/app/internal/http/middleware"
 	"pehlione.com/app/internal/http/render"
+	"pehlione.com/app/internal/modules/auth"
 	"pehlione.com/app/internal/modules/cart"
 	"pehlione.com/app/internal/modules/email"
 	"pehlione.com/app/internal/modules/orders"
@@ -60,6 +62,14 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 
 	// --- Router + Middleware order ---
 	r := gin.New()
+	if proxies := strings.TrimSpace(os.Getenv("TRUSTED_PROXIES")); proxies != "" {
+		list := strings.Split(proxies, ",")
+		if err := r.SetTrustedProxies(list); err != nil {
+			logger.Warn("failed to set trusted proxies", slog.String("error", err.Error()))
+		}
+	} else {
+		r.SetTrustedProxies(nil)
+	}
 
 	// Core observability first
 	r.Use(middleware.RequestID())
@@ -113,6 +123,8 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	cartH := handlers.NewCartHandler(db, flashCodec, cartCodec)
 	r.GET("/cart", cartH.Get)
 	r.POST("/cart/items", cartH.Add) // SSR: add to cart + redirect (form submission dari product pages)
+	r.POST("/cart/items/update", cartH.Update)
+	r.POST("/cart/items/remove", cartH.Remove)
 
 	// Company (public company info page)
 	companyH := handlers.NewCompanyHandler()
@@ -182,11 +194,13 @@ func NewRouter(logger *slog.Logger, db *gorm.DB) *gin.Engine {
 	authOnly.GET("/account", handlers.Account)
 
 	// Account routes
+	authRepo := auth.NewRepo(db)
 	ordersRepo := orders.NewRepo(db)
-	accountH := handlers.NewAccountOrdersHandler(ordersRepo)
+	accountH := handlers.NewAccountOrdersHandler(ordersRepo, authRepo, flashCodec)
 	account := r.Group("/account")
 	account.Use(middleware.RequireAuth(flashCodec))
 	account.GET("/orders", accountH.List)
+	account.POST("/account/password", accountH.ChangePassword)
 
 	// --- Email worker initialization ---
 	if envBool("EMAIL_SEND_ENABLED", true) {

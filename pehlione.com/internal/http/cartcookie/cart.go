@@ -27,6 +27,39 @@ func (c *Cart) AddItem(variantID string, qty int) {
 	c.Items = append(c.Items, Item{VariantID: variantID, Qty: qty})
 }
 
+// UpdateQuantity sets quantity or removes if qty <=0
+func (c *Cart) UpdateQuantity(variantID string, qty int) {
+	if c == nil {
+		return
+	}
+	for i := range c.Items {
+		if c.Items[i].VariantID == variantID {
+			if qty <= 0 {
+				c.Items = append(c.Items[:i], c.Items[i+1:]...)
+				return
+			}
+			c.Items[i].Qty = qty
+			return
+		}
+	}
+	if qty > 0 {
+		c.Items = append(c.Items, Item{VariantID: variantID, Qty: qty})
+	}
+}
+
+// RemoveItem deletes an item by variant id
+func (c *Cart) RemoveItem(variantID string) {
+	if c == nil {
+		return
+	}
+	for i := range c.Items {
+		if c.Items[i].VariantID == variantID {
+			c.Items = append(c.Items[:i], c.Items[i+1:]...)
+			return
+		}
+	}
+}
+
 // ToJSON serializes cart
 func (c *Cart) ToJSON() string {
 	if c == nil {

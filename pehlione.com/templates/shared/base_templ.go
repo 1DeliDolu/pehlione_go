@@ -33,7 +33,7 @@ func Base(vm BaseVM) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"tr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -46,7 +46,7 @@ func Base(vm BaseVM) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"bg-white text-gray-900\"><!-- Header --><header class=\"border-b border-gray-200\"><div class=\"mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8\"><div class=\"flex items-center justify-between\"><a href=\"/\" class=\"text-lg font-semibold\">Pehlione</a><nav class=\"flex items-center gap-4 text-sm\"><a href=\"/products\" class=\"text-gray-700 hover:text-gray-900\">Ürünler</a> <a href=\"/cart\" class=\"text-gray-700 hover:text-gray-900\">Sepet</a></nav></div></div></header><!-- Main --><main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"bg-white text-gray-900\"><!-- Header --><header class=\"border-b border-gray-200\"><div class=\"mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8\"><div class=\"flex items-center justify-between\"><a href=\"/\" class=\"text-lg font-semibold\"><span class=\"text-yellow-400\">Pehli</span><span class=\"text-orange-500\">ONE</span></a><nav class=\"flex items-center gap-4 text-sm\"><a href=\"/products\" class=\"text-gray-700 hover:text-gray-900\">Products</a> <a href=\"/cart\" class=\"text-gray-700 hover:text-gray-900\">Cart</a></nav></div></div></header><!-- Main --><main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -54,7 +54,7 @@ func Base(vm BaseVM) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main><!-- Footer --><footer class=\"border-t border-gray-200 py-12\"><div class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><p class=\"text-center text-sm text-gray-500\">© 2026 Pehlione. Tüm hakları saklıdır.</p></div></footer></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main><!-- Footer --><footer class=\"border-t border-gray-200 py-12\"><div class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><p class=\"text-center text-sm text-gray-500\">© 2026 Pehlione. All rights reserved.</p></div></footer></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -2,23 +2,76 @@ package pages
 
 import (
 	"fmt"
+
 	"pehlione.com/app/pkg/view"
 	"pehlione.com/app/templates/layout"
 )
 
 templ AccountOrders(flash *view.Flash, p view.AccountOrdersPage) {
-	@layout.Base("Siparişlerim", flash, AccountOrdersBody(p))
+	@layout.Base("My Orders", flash, AccountOrdersBody(p))
 }
 
 templ AccountOrdersBody(p view.AccountOrdersPage) {
-	<div class="container mx-auto px-4 py-8">
-		<h1 class="text-3xl font-bold mb-8">Siparişlerim</h1>
+	<div class="mx-auto max-w-5xl space-y-8 px-4 py-12">
+		<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+			<p class="text-xs font-semibold uppercase tracking-[0.4em] text-amber-400">pehliONE</p>
+			<h1 class="mt-2 text-3xl font-bold text-white">Hesap ve Siparişler</h1>
+			<p class="text-sm text-slate-300">Profil bilgilerinizi görün, şifrenizi güncelleyin ve sipariş geçmişinizi takip edin.</p>
+		</div>
 
-		<div class="bg-white rounded-lg shadow mb-6 p-4">
-			<form method="get" class="flex gap-4">
+		<div class="grid gap-6 lg:grid-cols-2">
+			<div class="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-white shadow-lg">
+				<h2 class="text-lg font-semibold text-white">Profil Bilgileri</h2>
+				<div class="mt-4 space-y-2 text-slate-200">
+					<p><span class="text-slate-400">E-posta:</span> { p.Account.Email }</p>
+					<p><span class="text-slate-400">Durum:</span> { p.Account.Status }</p>
+					<p><span class="text-slate-400">Üyelik Tarihi:</span> { p.Account.CreatedAt.Format("02.01.2006 15:04") }</p>
+					if p.Account.Verified {
+						<p class="text-emerald-300">E-posta doğrulandı ✓</p>
+					} else {
+						<p class="text-amber-300">E-posta doğrulanmadı</p>
+					}
+				</div>
+			</div>
+
+			<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg">
+				<h2 class="text-lg font-semibold text-white">Şifre Güncelle</h2>
+				<form method="post" action="/account/password" class="mt-4 space-y-4">
+					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+					<div>
+						<label class="text-xs uppercase tracking-wide text-slate-300">Mevcut Şifre</label>
+						<input type="password" name="current_password" autocomplete="current-password" class="mt-1 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden"/>
+						if p.PasswordErrors != nil && p.PasswordErrors["current_password"] != "" {
+							<p class="mt-1 text-xs text-rose-300">{ p.PasswordErrors["current_password"] }</p>
+						}
+					</div>
+					<div>
+						<label class="text-xs uppercase tracking-wide text-slate-300">Yeni Şifre</label>
+						<input type="password" name="new_password" autocomplete="new-password" class="mt-1 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden"/>
+						if p.PasswordErrors != nil && p.PasswordErrors["new_password"] != "" {
+							<p class="mt-1 text-xs text-rose-300">{ p.PasswordErrors["new_password"] }</p>
+						}
+					</div>
+					<div>
+						<label class="text-xs uppercase tracking-wide text-slate-300">Yeni Şifre (Tekrar)</label>
+						<input type="password" name="confirm_password" autocomplete="new-password" class="mt-1 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden"/>
+						if p.PasswordErrors != nil && p.PasswordErrors["confirm_password"] != "" {
+							<p class="mt-1 text-xs text-rose-300">{ p.PasswordErrors["confirm_password"] }</p>
+						}
+					</div>
+					<button type="submit" class="w-full rounded-2xl bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-amber-300">
+						Şifreyi Güncelle
+					</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg">
+			<h2 class="text-xl font-semibold text-white">Siparişlerim</h2>
+			<form method="get" class="mt-4 flex flex-wrap gap-4 text-sm text-slate-200">
 				<div>
-					<label class="block text-sm font-medium mb-2">Durum:</label>
-					<select name="status" class="border rounded px-3 py-2">
+					<label class="mb-1 block text-xs uppercase tracking-wide">Status</label>
+					<select name="status" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-white focus:border-amber-400 focus:outline-hidden">
 						<option value="">Tümü</option>
 						for _, s := range p.Statuses {
 							if s == p.FilterStatus {
@@ -30,99 +83,91 @@ templ AccountOrdersBody(p view.AccountOrdersPage) {
 					</select>
 				</div>
 				<div class="flex items-end gap-2">
-					<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+					<button type="submit" class="rounded-2xl border border-white/10 px-4 py-2 text-white hover:border-amber-300">
 						Filtrele
 					</button>
 					if p.FilterStatus != "" {
-						<a href="/account/orders" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+						<a href="/account/orders" class="rounded-2xl border border-white/10 px-4 py-2 text-white hover:border-amber-300">
 							Temizle
 						</a>
 					}
 				</div>
 			</form>
-		</div>
 
-		if len(p.Items) == 0 {
-			<div class="bg-yellow-50 border border-yellow-200 rounded p-4">
-				<p class="text-yellow-800">Henüz sipariş yok.</p>
-			</div>
-		} else {
-			<div class="bg-white rounded-lg shadow overflow-x-auto">
-				<table class="w-full text-left">
-					<thead>
-						<tr class="bg-gray-100 border-b">
-							<th class="px-4 py-2">Sipariş No</th>
-							<th class="px-4 py-2">Tarih</th>
-							<th class="px-4 py-2">Durum</th>
-							<th class="px-4 py-2">Tutar</th>
-							<th class="px-4 py-2">Öğe</th>
-							<th class="px-4 py-2">Ödeme</th>
-							<th class="px-4 py-2">İşlem</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, item := range p.Items {
-							<tr class="border-b hover:bg-gray-50">
-								<td class="px-4 py-3">
-									<a href={ templ.SafeURL(fmt.Sprintf("/orders/%s", item.ID)) } class="text-blue-600 hover:underline">
-										{ item.Number }
-									</a>
-								</td>
-								<td class="px-4 py-3">{ item.CreatedAt.Format("02.01.2006") }</td>
-								<td class="px-4 py-3">
-									<span class="px-2 py-1 rounded text-sm font-medium bg-gray-100">
-										{ item.Status }
-									</span>
-								</td>
-								<td class="px-4 py-3">{ fmt.Sprintf("%.2f %s", float64(item.TotalCents)/100, item.Currency) }</td>
-								<td class="px-4 py-3">{ fmt.Sprintf("%d", item.ItemCount) }</td>
-								<td class="px-4 py-3">
-									if item.PaidAt != nil {
-										<span class="text-green-600 font-medium">✓ Ödendi</span>
-									} else if item.Status == "created" {
-										<span class="text-orange-600 font-medium">Beklemede</span>
-									} else {
-										<span class="text-gray-500">-</span>
-									}
-								</td>
-								<td class="px-4 py-3">
-									<a href={ templ.SafeURL(fmt.Sprintf("/orders/%s", item.ID)) } class="text-blue-600 hover:underline text-sm">
-										Detay
-									</a>
-								</td>
+			if len(p.Items) == 0 {
+				<div class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-center text-sm text-slate-300">
+					Sipariş bulunamadı.
+				</div>
+			} else {
+				<div class="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
+					<table class="min-w-full text-left text-sm text-white">
+						<thead>
+							<tr class="bg-white/10 text-xs uppercase tracking-wide text-slate-300">
+								<th class="px-4 py-3">Sipariş #</th>
+								<th class="px-4 py-3">Tarih</th>
+								<th class="px-4 py-3">Durum</th>
+								<th class="px-4 py-3">Tutar</th>
+								<th class="px-4 py-3">Ürün</th>
+								<th class="px-4 py-3">Ödeme</th>
+								<th class="px-4 py-3">Aksiyon</th>
 							</tr>
-						}
-					</tbody>
-				</table>
-			</div>
+						</thead>
+						<tbody>
+							for _, item := range p.Items {
+								<tr class="border-t border-white/5 hover:bg-white/5">
+									<td class="px-4 py-3">
+										<a href={ templ.SafeURL(fmt.Sprintf("/orders/%s", item.ID)) } class="font-semibold text-amber-300 hover:underline">
+											{ item.Number }
+										</a>
+									</td>
+									<td class="px-4 py-3 text-slate-200">{ item.CreatedAt.Format("02.01.2006") }</td>
+									<td class="px-4 py-3">
+										<span class="rounded-full bg-white/10 px-3 py-1 text-xs">{ item.Status }</span>
+									</td>
+									<td class="px-4 py-3 text-slate-200">{ fmt.Sprintf("%.2f %s", float64(item.TotalCents)/100, item.Currency) }</td>
+									<td class="px-4 py-3 text-slate-200">{ fmt.Sprintf("%d", item.ItemCount) }</td>
+									<td class="px-4 py-3">
+										if item.PaidAt != nil {
+											<span class="text-emerald-300">✓ Ödendi</span>
+										} else if item.Status == "created" {
+											<span class="text-amber-300">Bekliyor</span>
+										} else {
+											<span class="text-slate-400">-</span>
+										}
+									</td>
+									<td class="px-4 py-3">
+										<a href={ templ.SafeURL(fmt.Sprintf("/orders/%s", item.ID)) } class="text-sm text-amber-300 hover:underline">
+											Detaylar
+										</a>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
 
-			<div class="mt-6 flex justify-center gap-2">
-				if p.IsPreviousPage {
-					<a href={ templ.SafeURL(fmt.Sprintf("/account/orders?page=%d&status=%s", p.Page-1, p.FilterStatus)) } class="px-3 py-2 border rounded hover:bg-gray-100">
-						Önceki
-					</a>
-				} else {
-					<span class="px-3 py-2 border rounded text-gray-400 cursor-not-allowed">Önceki</span>
-				}
-
-				for page := 1; page <= p.PagesTotal(); page++ {
-					if page == p.Page {
-						<span class="px-3 py-2 border rounded bg-blue-600 text-white">{ fmt.Sprintf("%d", page) }</span>
+				<div class="mt-6 flex justify-center gap-2 text-sm text-slate-200">
+					if p.IsPreviousPage {
+						<a href={ templ.SafeURL(fmt.Sprintf("/account/orders?page=%d&status=%s", p.Page-1, p.FilterStatus)) } class="rounded-full border border-white/10 px-4 py-2 hover:border-amber-300">Önceki</a>
 					} else {
-						<a href={ templ.SafeURL(fmt.Sprintf("/account/orders?page=%d&status=%s", page, p.FilterStatus)) } class="px-3 py-2 border rounded hover:bg-gray-100">
-							{ fmt.Sprintf("%d", page) }
-						</a>
+						<span class="rounded-full border border-white/5 px-4 py-2 text-slate-500">Önceki</span>
 					}
-				}
-
-				if p.IsNextPage {
-					<a href={ templ.SafeURL(fmt.Sprintf("/account/orders?page=%d&status=%s", p.Page+1, p.FilterStatus)) } class="px-3 py-2 border rounded hover:bg-gray-100">
-						Sonraki
-					</a>
-				} else {
-					<span class="px-3 py-2 border rounded text-gray-400 cursor-not-allowed">Sonraki</span>
-				}
-			</div>
-		}
+					for page := 1; page <= p.PagesTotal(); page++ {
+						if page == p.Page {
+							<span class="rounded-full border border-amber-300 bg-amber-400 px-4 py-2 text-slate-900">{ fmt.Sprintf("%d", page) }</span>
+						} else {
+							<a href={ templ.SafeURL(fmt.Sprintf("/account/orders?page=%d&status=%s", page, p.FilterStatus)) } class="rounded-full border border-white/10 px-4 py-2 hover:border-amber-300">
+								{ fmt.Sprintf("%d", page) }
+							</a>
+						}
+					}
+					if p.IsNextPage {
+						<a href={ templ.SafeURL(fmt.Sprintf("/account/orders?page=%d&status=%s", p.Page+1, p.FilterStatus)) } class="rounded-full border border-white/10 px-4 py-2 hover:border-amber-300">Sonraki</a>
+					} else {
+						<span class="rounded-full border border-white/5 px-4 py-2 text-slate-500">Sonraki</span>
+					}
+				</div>
+			}
+		</div>
 	</div>
 }

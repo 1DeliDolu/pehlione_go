@@ -10,153 +10,149 @@ templ AdminOrderDetail(flash *view.Flash, csrf string, o view.AdminOrderDetail) 
 }
 
 templ AdminOrderDetailBody(csrf string, o view.AdminOrderDetail) {
-	<div class="mb-3">
-		<a class="underline" href="/admin/orders">← Back</a>
-	</div>
+	<div class="space-y-8">
+		<div class="flex items-center gap-3 text-sm text-slate-300">
+			<a class="rounded-full border border-white/10 px-3 py-1 hover:border-amber-300 hover:text-white" href="/admin/orders">← Listeye dön</a>
+			<span class="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-wide text-amber-300">{ o.Status }</span>
+		</div>
 
-	<h1 class="text-2xl font-semibold mb-2">Order</h1>
-	<div class="border rounded p-3 mb-4">
-		<div><strong>ID:</strong> { o.ID }</div>
-		<div><strong>Status:</strong> { o.Status }</div>
-		<div><strong>UserID:</strong> { o.UserID }</div>
-		<div><strong>GuestEmail:</strong> { o.GuestEmail }</div>
-		<div><strong>Created:</strong> { o.CreatedAt }</div>
-	</div>
+		<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+			<h1 class="text-3xl font-bold text-white">Sipariş Özeti</h1>
+			<div class="mt-4 grid gap-4 md:grid-cols-2">
+				<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+					<p class="text-xs uppercase tracking-wide text-slate-400">ID</p>
+					<p class="text-sm text-white">{ o.ID }</p>
+				</div>
+				<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+					<p class="text-xs uppercase tracking-wide text-slate-400">Oluşturulma</p>
+					<p class="text-sm text-white">{ o.CreatedAt }</p>
+				</div>
+				<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+					<p class="text-xs uppercase tracking-wide text-slate-400">Kullanıcı</p>
+					<p class="text-sm text-white">{ o.UserID }</p>
+				</div>
+				<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+					<p class="text-xs uppercase tracking-wide text-slate-400">Guest Email</p>
+					<p class="text-sm text-white">{ o.GuestEmail }</p>
+				</div>
+			</div>
 
-	<h2 class="text-xl font-semibold mb-2">Actions</h2>
-	<div class="border rounded p-3 mb-4 space-y-3">
-		@actionForm(csrf, o.ID, "ship", "Ship (paid → shipped)", false)
-		@actionForm(csrf, o.ID, "deliver", "Deliver (shipped → delivered)", false)
-		@actionForm(csrf, o.ID, "cancel", "Cancel (created → cancelled)", false)
-		@refundForm(csrf, o.ID)
+			<div class="mt-6 grid gap-4 md:grid-cols-4">
+				@summaryMetric("Subtotal", o.Subtotal)
+				@summaryMetric("Shipping", o.Shipping)
+				@summaryMetric("Tax", o.Tax)
+				@summaryMetric("Total", o.Total)
+			</div>
+		</div>
 
-		<div class="text-sm">
-			Not: Geçersiz geçişlerde sistem hata verir. Bu butonlar her zaman görünür; state machine server-side enforced.
+		<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+			<h2 class="mb-4 text-xl font-semibold text-white">İşlemler</h2>
+			<div class="grid gap-4 lg:grid-cols-2">
+				@actionForm(csrf, o.ID, "ship", "Ship (paid → shipped)", false)
+				@actionForm(csrf, o.ID, "deliver", "Deliver (shipped → delivered)", false)
+				@actionForm(csrf, o.ID, "cancel", "Cancel (created → cancelled)", false)
+				@refundForm(csrf, o.ID)
+			</div>
+			<p class="mt-4 text-xs text-slate-400">Duruma izin verilmeyen geçişler back-end tarafından reddedilir.</p>
+		</div>
+
+		<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+			<h2 class="mb-4 text-xl font-semibold text-white">Sepet Ürünleri</h2>
+			<div class="space-y-3">
+				for _, it := range o.Items {
+					<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div>
+								<p class="font-semibold text-white">{ it.ProductName }</p>
+								if it.Options != "" {
+									<p class="text-xs text-slate-400">{ it.Options }</p>
+								}
+								<p class="text-xs text-slate-400">SKU: { it.SKU }</p>
+							</div>
+							<div class="text-right text-sm text-slate-200">
+								<div>Qty: { it.Qty }</div>
+								<div>{ it.Unit } → <span class="font-semibold text-white">{ it.Line }</span></div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<div class="grid gap-8 lg:grid-cols-2">
+			<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+				<h2 class="mb-4 text-xl font-semibold text-white">Durum Günlüğü</h2>
+				if len(o.Events) == 0 {
+					<p class="text-sm text-slate-300">Henüz event yok.</p>
+				} else {
+					<div class="space-y-3 text-sm text-slate-200">
+						for _, e := range o.Events {
+							<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+								<p class="text-xs text-slate-400">{ e.At }</p>
+								<p class="font-semibold text-white">{ e.Action }</p>
+								<p class="text-xs text-slate-400">{ e.From } → { e.To } • { e.ActorUserID }</p>
+								if e.Note != "" {
+									<p class="text-xs text-slate-400">"{ e.Note }"</p>
+								}
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			<div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl">
+				<h2 class="mb-4 text-xl font-semibold text-white">Finansal Hareketler</h2>
+				if len(o.Financial) == 0 {
+					<p class="text-sm text-slate-300">Kayıt yok.</p>
+				} else {
+					<div class="space-y-3 text-sm text-slate-200">
+						for _, f := range o.Financial {
+							<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+								<p class="text-xs text-slate-400">{ f.At }</p>
+								<p class="font-semibold text-white">{ f.Event } • { f.AmountStr }</p>
+								<p class="text-xs text-slate-400">{ f.RefType } → { f.RefID }</p>
+							</div>
+						}
+					</div>
+				}
+			</div>
 		</div>
 	</div>
-
-	<h2 class="text-xl font-semibold mb-2">Items</h2>
-	<table class="w-full border-collapse mb-4">
-		<thead>
-			<tr class="border-b">
-				<th class="text-left p-2">Product</th>
-				<th class="text-left p-2">SKU</th>
-				<th class="text-left p-2">Qty</th>
-				<th class="text-left p-2">Unit</th>
-				<th class="text-left p-2">Line</th>
-			</tr>
-		</thead>
-		<tbody>
-			for _, it := range o.Items {
-				<tr class="border-b align-top">
-					<td class="p-2">
-						{ it.ProductName }
-						if it.Options != "" {
-							<div class="text-sm mt-1"><code>{ it.Options }</code></div>
-						}
-					</td>
-					<td class="p-2">{ it.SKU }</td>
-					<td class="p-2">{ it.Qty }</td>
-					<td class="p-2">{ it.Unit }</td>
-					<td class="p-2">{ it.Line }</td>
-				</tr>
-			}
-		</tbody>
-	</table>
-
-	<div class="border rounded p-3 mb-6">
-		<div><strong>Subtotal:</strong> { o.Subtotal }</div>
-		<div><strong>Shipping:</strong> { o.Shipping }</div>
-		<div><strong>Tax:</strong> { o.Tax }</div>
-		<div><strong>Discount:</strong> { o.Discount }</div>
-		<div class="mt-2"><strong>Total:</strong> { o.Total }</div>
-	</div>
-
-	<h2 class="text-xl font-semibold mb-2">Audit</h2>
-	if len(o.Events) == 0 {
-		<div>No events.</div>
-	} else {
-		<table class="w-full border-collapse mb-6">
-			<thead>
-				<tr class="border-b">
-					<th class="text-left p-2">At</th>
-					<th class="text-left p-2">Action</th>
-					<th class="text-left p-2">From</th>
-					<th class="text-left p-2">To</th>
-					<th class="text-left p-2">Actor</th>
-					<th class="text-left p-2">Note</th>
-				</tr>
-			</thead>
-			<tbody>
-				for _, e := range o.Events {
-					<tr class="border-b">
-						<td class="p-2">{ e.At }</td>
-						<td class="p-2">{ e.Action }</td>
-						<td class="p-2">{ e.From }</td>
-						<td class="p-2">{ e.To }</td>
-						<td class="p-2">{ e.ActorUserID }</td>
-						<td class="p-2">{ e.Note }</td>
-					</tr>
-				}
-			</tbody>
-		</table>
-	}
-
-	<h2 class="text-xl font-semibold mb-2">Financial Ledger</h2>
-	if len(o.Financial) == 0 {
-		<div>No entries.</div>
-	} else {
-		<table class="w-full border-collapse">
-			<thead>
-				<tr class="border-b">
-					<th class="text-left p-2">At</th>
-					<th class="text-left p-2">Event</th>
-					<th class="text-left p-2">Amount</th>
-					<th class="text-left p-2">Ref Type</th>
-					<th class="text-left p-2">Ref ID</th>
-				</tr>
-			</thead>
-			<tbody>
-				for _, f := range o.Financial {
-					<tr class="border-b">
-						<td class="p-2">{ f.At }</td>
-						<td class="p-2">{ f.Event }</td>
-						<td class="p-2">{ f.AmountStr }</td>
-						<td class="p-2">{ f.RefType }</td>
-						<td class="p-2 text-sm">{ f.RefID }</td>
-					</tr>
-				}
-			</tbody>
-		</table>
-	}
 }
 
 templ actionForm(csrf string, orderID string, action string, label string, isRefund bool) {
-	<form method="post" action={ "/admin/orders/" + orderID + "/" + action } class="border rounded p-3">
-		<input type="hidden" name="csrf_token" value={ csrf } />
-		<div class="font-semibold mb-2">{ label }</div>
-		<textarea class="w-full border p-2 rounded mb-2" name="note" rows="2" placeholder="Note (optional)"></textarea>
-		<label class="text-sm block mb-2">
-			<input type="checkbox" name="confirm" value="1" />
+	<form method="post" action={ "/admin/orders/" + orderID + "/" + action } class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white">
+		<input type="hidden" name="csrf_token" value={ csrf }/>
+		<div class="mb-2 font-semibold text-white">{ label }</div>
+		<textarea class="mb-2 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="note" rows="2" placeholder="Note (optional)"></textarea>
+		<label class="mb-2 inline-flex items-center gap-2 text-xs text-slate-300">
+			<input type="checkbox" name="confirm" value="1" class="rounded border-white/20 bg-transparent"/>
 			Onaylıyorum
 		</label>
-		<button class="px-4 py-2 border rounded" type="submit">Execute</button>
+		<button class="inline-flex rounded-full border border-white/10 px-4 py-2 text-xs font-semibold hover:border-amber-300" type="submit">Uygula</button>
 	</form>
 }
 
 templ refundForm(csrf string, orderID string) {
-	<form method="post" action={ "/admin/orders/" + orderID + "/refund" } class="border rounded p-3">
-		<input type="hidden" name="csrf_token" value={ csrf } />
-		<div class="font-semibold mb-2">Refund (paid → refunded/partially_refunded)</div>
+	<form method="post" action={ "/admin/orders/" + orderID + "/refund" } class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white">
+		<input type="hidden" name="csrf_token" value={ csrf }/>
+		<div class="mb-2 font-semibold text-white">Refund (paid → refunded/partial)</div>
 		<div class="mb-2">
-			<label class="text-sm block mb-1">Amount (cents, blank = full)</label>
-			<input class="w-full border p-2 rounded" type="number" name="amount_cents" min="0" placeholder="Leave blank for full refund" />
+			<label class="mb-1 block text-xs text-slate-400">Amount (cents, blank = full)</label>
+			<input class="w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" type="number" name="amount_cents" min="0" placeholder="Leave blank for full refund"/>
 		</div>
-		<textarea class="w-full border p-2 rounded mb-2" name="note" rows="2" placeholder="Reason (optional)"></textarea>
-		<label class="text-sm block mb-2">
-			<input type="checkbox" name="confirm" value="1" />
+		<textarea class="mb-2 w-full rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white placeholder:text-slate-400 focus:border-amber-400 focus:outline-hidden" name="note" rows="2" placeholder="Reason (optional)"></textarea>
+		<label class="mb-2 inline-flex items-center gap-2 text-xs text-slate-300">
+			<input type="checkbox" name="confirm" value="1" class="rounded border-white/20 bg-transparent"/>
 			Onaylıyorum
 		</label>
-		<button class="px-4 py-2 border rounded" type="submit">Execute</button>
+		<button class="inline-flex rounded-full border border-white/10 px-4 py-2 text-xs font-semibold hover:border-amber-300" type="submit">Uygula</button>
 	</form>
+}
+
+templ summaryMetric(label, value string) {
+	<div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+		<p class="text-xs uppercase tracking-wide text-slate-400">{ label }</p>
+		<p class="text-lg font-semibold text-white">{ value }</p>
+	</div>
 }

@@ -61,3 +61,17 @@ func (r *Repo) Create(user *User) error {
 	}
 	return r.db.Create(user).Error
 }
+
+// GetByID finds a user by ID.
+func (r *Repo) GetByID(ctx context.Context, id string) (*User, error) {
+	var user User
+	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// UpdatePassword updates a user's password hash.
+func (r *Repo) UpdatePassword(ctx context.Context, userID string, passwordHash string) error {
+	return r.db.WithContext(ctx).Model(&User{}).Where("id = ?", userID).Update("password_hash", passwordHash).Error
+}

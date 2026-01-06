@@ -10,6 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
+
 	"pehlione.com/app/internal/http/validation"
 	"pehlione.com/app/pkg/view"
 	"pehlione.com/app/templates/layout"
@@ -65,17 +66,17 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"text-2xl font-semibold mb-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"mb-4 text-2xl font-semibold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if isEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span>Edit Product</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span>Edit product</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<span>New Product</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<span>New product</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -85,14 +86,14 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 			return templ_7745c5c3_Err
 		}
 		if pageErr != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"mb-4 p-3 border rounded\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"mb-4 rounded border p-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(pageErr)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 24, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 25, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -110,7 +111,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 		var templ_7745c5c3_Var4 templ.SafeURL
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(formAction(p.ID, isEdit))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 27, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 28, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -123,20 +124,20 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 28, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 29, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"><div><label class=\"block text-sm mb-1\">Name</label> <input class=\"w-full border p-2 rounded\" name=\"name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"><div><label class=\"mb-1 block text-sm\">Name</label> <input class=\"w-full rounded border p-2\" name=\"name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 32, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 33, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -147,14 +148,14 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 			return templ_7745c5c3_Err
 		}
 		if errs != nil && errs["name"] != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"text-sm mt-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"mt-1 text-sm\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(errs["name"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 34, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 35, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -165,32 +166,32 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><div><label class=\"block text-sm mb-1\">Slug</label> <input class=\"w-full border p-2 rounded\" name=\"slug\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><div><label class=\"mb-1 block text-sm\">Slug</label> <input class=\"w-full rounded border p-2\" name=\"slug\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.Slug)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 40, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 41, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"><div class=\"text-sm mt-1\">Boş bırakırsanız name’den üretilecektir.</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"><div class=\"mt-1 text-sm\">If left empty, it will be generated from the name.</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if errs != nil && errs["slug"] != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"text-sm mt-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"mt-1 text-sm\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(errs["slug"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 43, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 44, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -201,14 +202,14 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><div><label class=\"block text-sm mb-1\">Status</label> <select class=\"w-full border p-2 rounded\" name=\"status\"><option value=\"active\" selected=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><div><label class=\"mb-1 block text-sm\">Status</label> <select class=\"w-full rounded border p-2\" name=\"status\"><option value=\"active\" selected=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(p.Status == "active")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 50, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 51, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -221,7 +222,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(p.Status == "hidden")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 51, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 52, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -232,14 +233,14 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 			return templ_7745c5c3_Err
 		}
 		if errs != nil && errs["status"] != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"text-sm mt-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"mt-1 text-sm\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(errs["status"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 54, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 55, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -250,14 +251,14 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div><div><label class=\"block text-sm mb-1\">Description</label> <textarea class=\"w-full border p-2 rounded\" name=\"description\" rows=\"6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div><div><label class=\"mb-1 block text-sm\">Description</label> <textarea class=\"w-full rounded border p-2\" name=\"description\" rows=\"6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 60, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 61, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -268,14 +269,14 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 			return templ_7745c5c3_Err
 		}
 		if errs != nil && errs["description"] != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"text-sm mt-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"mt-1 text-sm\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(errs["description"])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 62, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 63, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -286,7 +287,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div><button class=\"px-4 py-2 border rounded\" type=\"submit\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div><button class=\"rounded border px-4 py-2\" type=\"submit\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -306,33 +307,33 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 			return templ_7745c5c3_Err
 		}
 		if isEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<hr class=\"my-6\"><h2 class=\"text-xl font-semibold mb-2\">Variants</h2><form method=\"post\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<hr class=\"my-6\"><h2 class=\"mb-2 text-xl font-semibold\">Variants</h2><form method=\"post\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var15 templ.SafeURL
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/variants")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 80, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 81, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"space-y-2 mb-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"mb-4 space-y-2\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 81, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 82, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"><div class=\"grid grid-cols-2 gap-2\"><input class=\"border p-2 rounded\" name=\"sku\" placeholder=\"SKU\"> <input class=\"border p-2 rounded\" name=\"currency\" placeholder=\"Currency (EUR)\" value=\"EUR\"> <input class=\"border p-2 rounded\" name=\"price_cents\" placeholder=\"Price cents\"> <input class=\"border p-2 rounded\" name=\"stock\" placeholder=\"Stock\"></div><textarea class=\"w-full border p-2 rounded\" name=\"options_json\" rows=\"2\" placeholder='{\"size\":\"M\",\"color\":\"Black\"}'></textarea> <button class=\"px-4 py-2 border rounded\" type=\"submit\">Add Variant</button></form><table class=\"w-full border-collapse mb-6\"><thead><tr class=\"border-b\"><th class=\"text-left p-2\">SKU / Actions</th><th class=\"text-left p-2\">Price</th><th class=\"text-left p-2\">Stock</th><th class=\"text-left p-2\">Options</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"><div class=\"grid grid-cols-2 gap-2\"><input class=\"rounded border p-2\" name=\"sku\" placeholder=\"SKU\"> <input class=\"rounded border p-2\" name=\"currency\" placeholder=\"Currency (EUR)\" value=\"EUR\"> <input class=\"rounded border p-2\" name=\"price_cents\" placeholder=\"Price cents\"> <input class=\"rounded border p-2\" name=\"stock\" placeholder=\"Stock\"></div><textarea class=\"w-full rounded border p-2\" name=\"options_json\" rows=\"2\" placeholder='{\"size\":\"M\",\"color\":\"Black\"}'></textarea> <button class=\"rounded border px-4 py-2\" type=\"submit\">Add variant</button></form><table class=\"mb-6 w-full border-collapse\"><thead><tr class=\"border-b\"><th class=\"p-2 text-left\">SKU / Actions</th><th class=\"p-2 text-left\">Price</th><th class=\"p-2 text-left\">Stock</th><th class=\"p-2 text-left\">Options</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -344,7 +345,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var17 templ.SafeURL
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/variants/" + v.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 105, Col: 90}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 106, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -357,7 +358,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 106, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 107, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -370,72 +371,72 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(v.SKU)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 107, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 108, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</strong></div><div class=\"grid grid-cols-2 gap-2 mt-2\"><input class=\"border p-2 rounded\" name=\"price_cents\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</strong></div><div class=\"mt-2 grid grid-cols-2 gap-2\"><input class=\"rounded border p-2\" name=\"price_cents\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(itoa(v.PriceCents))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 109, Col: 97}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 110, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\"> <input class=\"border p-2 rounded\" name=\"currency\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\"> <input class=\"rounded border p-2\" name=\"currency\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var21 string
 				templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(v.Currency)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 110, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 111, Col: 77}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\"> <input class=\"border p-2 rounded\" name=\"stock\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\"> <input class=\"rounded border p-2\" name=\"stock\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var22 string
 				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(itoa(v.Stock))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 111, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 112, Col: 77}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\"></div><textarea class=\"w-full border p-2 rounded mt-2\" name=\"options_json\" rows=\"2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\"></div><textarea class=\"mt-2 w-full rounded border p-2\" name=\"options_json\" rows=\"2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var23 string
 				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(v.Options)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 113, Col: 105}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 114, Col: 97}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</textarea><div class=\"mt-2\"><button class=\"px-3 py-2 border rounded\" type=\"submit\">Update</button></div></form><form method=\"post\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</textarea><div class=\"mt-2\"><button class=\"rounded border px-3 py-2\" type=\"submit\">Update</button></div></form><form method=\"post\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var24 templ.SafeURL
 				templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/variants/" + v.ID + "/sku")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 119, Col: 99}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 120, Col: 92}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 				if templ_7745c5c3_Err != nil {
@@ -448,7 +449,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var25 string
 				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 120, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 121, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {
@@ -461,20 +462,20 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(v.SKU)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 121, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 122, Col: 57}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</strong></div><input class=\"border p-2 rounded w-full mt-2\" name=\"new_sku\" placeholder=\"New SKU\"> <label class=\"text-sm block mt-1\"><input type=\"checkbox\" name=\"confirm_sku_change\" value=\"1\"> SKU değişimini onaylıyorum</label> <button class=\"px-3 py-2 border rounded\" type=\"submit\">Change SKU</button></form><form method=\"post\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</strong></div><input class=\"mt-2 w-full rounded border p-2\" name=\"new_sku\" placeholder=\"New SKU\"> <label class=\"mt-1 block text-sm\"><input type=\"checkbox\" name=\"confirm_sku_change\" value=\"1\"> I confirm the SKU change</label> <button class=\"rounded border px-3 py-2\" type=\"submit\">Change SKU</button></form><form method=\"post\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var27 templ.SafeURL
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/variants/" + v.ID + "/delete")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 129, Col: 102}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 130, Col: 95}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
@@ -487,20 +488,20 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var28 string
 				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 130, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 131, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\"> <button class=\"underline\" type=\"submit\">Delete Variant</button></form></td><td class=\"p-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\"> <button class=\"underline\" type=\"submit\">Delete variant</button></form></td><td class=\"p-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var29 string
 				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(v.PriceCents)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 134, Col: 42}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 135, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
@@ -513,7 +514,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var30 string
 				templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(v.Currency)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 134, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 135, Col: 51}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 				if templ_7745c5c3_Err != nil {
@@ -526,7 +527,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var31 string
 				templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(v.Stock)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 135, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 136, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 				if templ_7745c5c3_Err != nil {
@@ -539,7 +540,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(v.Options)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 136, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 137, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -550,33 +551,33 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</tbody></table><h2 class=\"text-xl font-semibold mb-2\">Images</h2><form method=\"post\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</tbody></table><h2 class=\"mb-2 text-xl font-semibold\">Images</h2><form method=\"post\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var33 templ.SafeURL
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/images/upload")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 144, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 145, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" enctype=\"multipart/form-data\" class=\"space-y-2 mb-4\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" enctype=\"multipart/form-data\" class=\"mb-4 space-y-2\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var34 string
 			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 145, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 146, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"><div class=\"grid grid-cols-2 gap-2\"><input class=\"border p-2 rounded\" type=\"file\" name=\"image\" accept=\"image/*\"> <input class=\"border p-2 rounded\" name=\"position\" placeholder=\"Position (0..)\" value=\"0\"></div><button class=\"px-4 py-2 border rounded\" type=\"submit\">Upload Image</button></form><table class=\"w-full border-collapse\"><thead><tr class=\"border-b\"><th class=\"text-left p-2\">Position</th><th class=\"text-left p-2\">URL</th><th class=\"text-left p-2\">Actions</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"><div class=\"grid grid-cols-2 gap-2\"><input class=\"rounded border p-2\" type=\"file\" name=\"image\" accept=\"image/*\"> <input class=\"rounded border p-2\" name=\"position\" placeholder=\"Position (0..)\" value=\"0\"></div><button class=\"rounded border px-4 py-2\" type=\"submit\">Upload image</button></form><table class=\"w-full border-collapse\"><thead><tr class=\"border-b\"><th class=\"p-2 text-left\">Position</th><th class=\"p-2 text-left\">URL</th><th class=\"p-2 text-left\">Actions</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -588,7 +589,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var35 string
 				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(im.Position)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 164, Col: 41}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 165, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 				if templ_7745c5c3_Err != nil {
@@ -601,7 +602,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var36 string
 				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(im.URL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 165, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 166, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
@@ -614,7 +615,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var37 templ.SafeURL
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/images/" + im.ID + "/delete")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 167, Col: 101}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 168, Col: 94}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -627,7 +628,7 @@ func AdminProductFormBody(csrf string, p view.AdminProduct, errs validation.Fiel
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 168, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_product_form.templ`, Line: 169, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 				if templ_7745c5c3_Err != nil {

@@ -15,7 +15,21 @@ type AccountOrderListItem struct {
 	PaidAt     *time.Time
 }
 
+type AccountInfo struct {
+	Email     string
+	Status    string
+	CreatedAt time.Time
+	Verified  bool
+}
+
+type ChangePasswordForm struct {
+	Current string
+	New     string
+	Confirm string
+}
+
 type AccountOrdersPage struct {
+	Account        AccountInfo
 	Items          []AccountOrderListItem
 	Total          int64
 	Page           int
@@ -24,6 +38,8 @@ type AccountOrdersPage struct {
 	Statuses       []string
 	IsPreviousPage bool
 	IsNextPage     bool
+	CSRFToken      string
+	PasswordErrors map[string]string
 }
 
 func (p AccountOrdersPage) PagesTotal() int {

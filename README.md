@@ -27,13 +27,21 @@ Go tabanlı, server-side rendering (SSR) kullanan modern e-ticaret platformu.
 - ✅ Sipariş detay sayfası
 - ✅ Admin sipariş yönetimi
 
-### Teknik Özellikler
+### Technical Features
 - Server-Side Rendering (Templ)
-- Type-safe templates
-- Flash message sistemi
+- Type-safe templates with component architecture
+- Reusable product card components (StandardProductCard, SaleProductCard)
+- Accessibility features (ARIA labels, SR-only headings, dialog roles)
+- Performance optimizations (lazy-loading images, async decoding)
+- Async email system with outbox pattern
+- Payment provider abstraction
+- PDF invoice generation
+- Refund processing with webhooks
+- Flash message system
 - Error handling middleware
 - Request ID tracking
 - Structured logging (slog)
+- CSRF protection (double-submit cookie pattern)
 
 ## 🏗️ Proje Yapısı
 
@@ -41,7 +49,7 @@ Go tabanlı, server-side rendering (SSR) kullanan modern e-ticaret platformu.
 ```
 pehlione.com/
 ├── cmd/
-│   └── web/           # Ana uygulama entry point
+│   └── web/           # Main application entry point
 ├── internal/
 │   ├── http/
 │   │   ├── handlers/  # HTTP request handlers
@@ -49,27 +57,42 @@ pehlione.com/
 │   │   │   ├── cart.go
 │   │   │   ├── checkout.go
 │   │   │   ├── orders.go
+│   │   │   ├── products.go
 │   │   │   └── auth.go
-│   │   ├── middleware/ # Middleware katmanı
+│   │   ├── middleware/ # Middleware layer
 │   │   │   ├── auth.go
 │   │   │   ├── csrf.go
 │   │   │   ├── cart_badge.go
 │   │   │   └── flash.go
 │   │   ├── cartcookie/ # Cookie-based cart codec
 │   │   ├── flash/      # Flash message codec
-│   │   └── router.go   # Route tanımları
+│   │   └── router.go   # Route definitions
 │   ├── modules/
-│   │   ├── cart/       # Sepet business logic
+│   │   ├── auth/       # Authentication logic
+│   │   ├── cart/       # Cart business logic
+│   │   ├── checkout/   # Checkout logic
+│   │   ├── email/      # Email outbox service (async)
 │   │   │   ├── models.go
-│   │   │   ├── repo.go
-│   │   │   └── service.go
-│   │   ├── orders/     # Sipariş business logic
+│   │   │   ├── service.go
+│   │   │   ├── worker.go
+│   │   │   ├── smtp_sender.go
+│   │   │   └── mailtrap.go
+│   │   ├── orders/     # Order business logic
 │   │   │   ├── models.go
 │   │   │   ├── repo.go
 │   │   │   ├── service.go
+│   │   │   ├── admin_service.go
 │   │   │   └── errors.go
-│   │   ├── checkout/   # Checkout logic
-│   │   └── payments/   # Ödeme entegrasyonu
+│   │   ├── payments/   # Payment integration
+│   │   │   ├── provider.go
+│   │   │   ├── provider_mock.go
+│   │   │   ├── service.go
+│   │   │   ├── refund_service.go
+│   │   │   └── webhook_service.go
+│   │   ├── products/   # Product management
+│   │   └── users/      # User management
+│   ├── pdf/           # PDF invoice generation
+│   │   └── invoice.go
 │   └── shared/
 │       └── apperr/     # Application errors
 ├── pkg/
@@ -78,21 +101,30 @@ pehlione.com/
 │       ├── checkout.go
 │       └── flash.go
 ├── templates/
-│   ├── layout/         # Layout bileşenleri
+│   ├── components/     # Reusable UI components
+│   ├── layout/         # Layout components
+│   │   └── base.templ
+│   ├── shared/         # Shared template utilities
 │   │   ├── base.templ
-│   │   └── header.templ
-│   └── pages/          # Sayfa templates
+│   │   └── money.go
+│   └── pages/          # Page templates
+│       ├── products/
+│       │   ├── index.templ  # Product listing with StandardProductCard/SaleProductCard
+│       │   └── show.templ   # Product detail page
 │       ├── cart.templ
 │       ├── checkout.templ
-│       ├── products.templ
+│       ├── order_detail.templ
+│       ├── order_pay.templ
+│       ├── account_orders.templ
+│       ├── admin_*.templ    # Admin panel pages
 │       └── home.templ
-├── static/             # Static assets
+├── static/             # Static assets (CSS, JS, images)
+├── storage/            # File storage (product images)
 ├── migrations/         # Database migrations (goose)
 └── magefile.go         # Build automation (Mage)
 ```
 ---
-
-## 🗄️ Database Schema
+## 🗄️ Database Schema (Extended)
 
 ### Core Tables
 - **users** - Kullanıcı bilgileri (id, email, password_hash, role)
@@ -101,13 +133,19 @@ pehlione.com/
 - **cart_items** - Sepet içerikleri (cart_id, variant_id, quantity)
 
 ### Product Tables
-- **products** - Ürün bilgileri (id, name, slug, status)
-- **product_variants** - Ürün varyantları (id, product_id, sku, price_cents, stock)
+- **products** - Product information (id, name, slug, status)
+- **product_variants** - Product variants (id, product_id, sku, price_cents, stock)
+- **product_images** - Product images (id, product_id, storage_key, url, display_order)
 
 ### Order Tables
-- **orders** - Siparişler (id, user_id, guest_email, status, total_cents)
-- **order_items** - Sipariş kalemleri
-- **order_events** - Sipariş durum geçişleri
+- **orders** - Orders (id, user_id, guest_email, status, total_cents)
+- **order_items** - Order line items
+- **order_events** - Order status transitions
+
+### Email & Payment Tables
+- **outbox_emails** - Async email queue (id, to_email, subject, body_html, status, attempts)
+- **payment_intents** - Payment tracking (id, order_id, provider, status, amount_cents)
+- **refunds** - Refund records (id, payment_intent_id, amount_cents, status)
 
 ## 🛠️ Teknoloji Stack
 
@@ -138,29 +176,30 @@ pehlione.com/
 
 1. **Projeyi klonlayın**
 ---
+---
 ```bash
 git clone <repo-url>
 cd pehlione.com
 ```
 ---
-
 2. **Bağımlılıkları yükleyin**
+---
 ---
 ```bash
 go mod download
 npm install  # Tailwind için
 ```
 ---
-
 3. **Environment variables ayarlayın**
+---
 ---
 ```bash
 # .env dosyası oluşturun
 cp .env.example .env
 ```
 ---
-
 Gerekli değişkenler:
+---
 ---
 ```env
 DB_DSN=user:pass@tcp(localhost:3306)/pehlione_go?parseTime=true
@@ -168,22 +207,22 @@ SECRET_KEY=<64-char-hex-secret>
 SESSION_TTL_HOURS=168
 ```
 ---
-
 4. **Database migration**
+---
 ---
 ```bash
 goose -dir migrations mysql "user:pass@/pehlione_go" up
 ```
 ---
-
 5. **Templ generate**
+---
 ---
 ```bash
 templ generate
 ```
 ---
-
 6. **Build ve çalıştır**
+---
 ---
 ```bash
 # Development (hot reload)
@@ -194,7 +233,6 @@ mage build
 ./bin/pehlione-web.exe
 ```
 ---
-
 ## 🔐 Güvenlik
 
 ### Implemented Security Features
@@ -223,6 +261,7 @@ Database seed migration ile oluşturulur:
 
 ### Public Routes
 ---
+---
 ```
 GET  /                    # Ana sayfa
 GET  /products            # Ürün listesi
@@ -237,8 +276,8 @@ POST /login               # Giriş işlemi (CSRF)
 POST /logout              # Çıkış (CSRF)
 ```
 ---
-
 ### Authenticated Routes
+---
 ---
 ```
 GET  /account/orders      # Kullanıcı siparişleri
@@ -246,8 +285,8 @@ GET  /orders/:id          # Sipariş detayı
 POST /orders/:id/pay      # Ödeme başlat (CSRF)
 ```
 ---
-
 ### Admin Routes
+---
 ---
 ```
 GET  /admin/orders        # Tüm siparişler
@@ -255,7 +294,6 @@ GET  /admin/orders/:id    # Sipariş detayı
 POST /admin/orders/:id    # Sipariş aksiyonu (CSRF)
 ```
 ---
-
 ## 🚦 Middleware Stack
 
 Request işleme sırası:
@@ -291,6 +329,60 @@ Request işleme sırası:
 
 ## 💳 Checkout Flow
 
+## 📧 Email System (Outbox Pattern)
+
+### Architecture
+- **Outbox Table** - Reliable email delivery with retry logic
+- **Background Worker** - Processes pending emails asynchronously
+- **Multiple Senders** - SMTP, Mailtrap (test mode)
+- **Retry Strategy** - Exponential backoff for failed sends
+
+### Email Flow
+---
+
+---
+```go
+// 1. Enqueue email (in transaction with order creation)
+emailSvc.Enqueue(ctx, order.Email, "Order Confirmation", text, html)
+
+// 2. Background worker polls outbox
+emails := emailSvc.GetPending(ctx, 10)
+
+// 3. Send via configured provider
+for _, email := range emails {
+    err := sender.Send(ctx, Message{
+        To: email.ToEmail,
+        Subject: email.Subject,
+        HTML: *email.BodyHTML,
+    })
+    // Update status (sent/failed) with retry logic
+}
+```
+---
+
+## 💳 Payment & Refund System
+
+### Payment Provider Interface
+- **Provider interface** - Abstraction for payment gateways
+- **Mock provider** - Development/testing implementation
+- **Payment intents** - Track payment lifecycle
+- **Webhook handling** - Process provider callbacks
+
+### Refund Service
+- **Full and partial refunds** - Flexible refund amounts
+- **Webhook integration** - Automatic refund processing
+- **Status tracking** - Refund lifecycle management
+- **Database persistence** - Refund records and history
+
+## 📄 PDF Invoice Generation
+
+### Features
+- **Branded invoices** - Company logo and colors (pehliONE yellow/orange)
+- **Order details** - Line items, quantities, prices
+- **Totals breakdown** - Subtotal, shipping, tax, total
+- **Customer info** - Billing address and contact details
+- **go-pdf/fpdf** - Native Go PDF generation (no external dependencies)
+
 ### 1. Cart Validation
 - En az 1 ürün kontrolü
 - Currency consistency check
@@ -301,6 +393,7 @@ Request işleme sırası:
 - Email validation (guest için zorunlu)
 
 ### 3. Order Creation (Transaction)
+---
 ---
 ```
 1. Read cart items
@@ -313,7 +406,6 @@ Request işleme sırası:
 8. Clear cart (DB or cookie)
 ```
 ---
-
 ### 4. Stock Management
 - Pessimistic locking (SELECT FOR UPDATE)
 - Atomic stock deduction
@@ -321,22 +413,87 @@ Request işleme sırası:
 
 ## 🎨 Template System (Templ)
 
+## ♿ Accessibility & Performance
+
+### Accessibility Features
+- ✅ ARIA labels and landmarks (`aria-labelledby`, `aria-modal`)
+- ✅ SR-only headings for screen readers
+- ✅ Proper dialog roles with labeled headings
+- ✅ Semantic HTML structure
+- ✅ Keyboard navigation support
+- ✅ Color contrast compliance
+
+### Performance Optimizations
+- ✅ Lazy-loading images (`loading="lazy"`)
+- ✅ Async image decoding (`decoding="async"`)
+- ✅ Session cache for cart badge
+- ✅ Component-based templates (reduced duplication)
+- ✅ Optimized database queries with eager loading
+
+### Component Architecture
+Product pages use reusable template components to ensure consistency and maintainability:
+
+**StandardProductCard**
+- Standard product display with hover effects
+- Disabled state for out-of-stock items
+- Lazy-loaded images
+- Add to cart form with CSRF protection
+
+**SaleProductCard**
+- Sale badge overlay
+- Rose-themed styling for discounted items
+- Same structure as StandardProductCard with visual emphasis
+
+Benefits:
+- Single source of truth for product card markup
+- Consistent behavior across the application
+- Easier maintenance and updates
+- Type-safe props with Go templating
+
 ### Type-safe Components
 ---
+---
 ```go
-templ Cart(flash *view.Flash, p view.CartPage) {
-    @layout.Base("Shopping Cart", flash, CartBody(p))
+// Reusable product card components
+templ StandardProductCard(p ProductCardVM, csrf string) {
+    <div class="group flex flex-col rounded-xl border border-gray-100 bg-white p-4...">
+        <a href={ fmt.Sprintf("/products/%s", p.Slug) }>
+            if p.ImageURL != "" {
+                <img src={ p.ImageURL } loading="lazy" decoding="async" .../>
+            }
+        </a>
+        // ... button with out-of-stock handling
+    </div>
+}
+
+templ SaleProductCard(p ProductCardVM, csrf string) {
+    // Similar structure with sale-specific styling
+}
+
+// Page template using components
+templ ProductsIndexPage(vm ProductsIndexVM) {
+    @shared.Base(shared.BaseVM{Title: vm.Title}) {
+        <section aria-labelledby="products-heading">
+            <h2 id="products-heading" class="sr-only">Products</h2>
+            for _, p := range vm.SaleProducts {
+                @SaleProductCard(p, vm.CSRFToken)
+            }
+        </section>
+    }
 }
 ```
 ---
-
 ### View Models
-- **view.CartPage** - Sepet görünümü için
+- **view.CartPage** - Cart view with items
 - **view.CheckoutForm** - Checkout form data
-- **view.CheckoutSummary** - Sipariş özeti
+- **view.CheckoutSummary** - Order summary
 - **view.HeaderCtx** - Header context (auth, cart badge)
+- **ProductsIndexVM** - Product listing page (with CategoryGroups, SaleProducts)
+- **ProductCardVM** - Individual product card data
+- **ProductDetailVM** - Product detail page with variants
 
 ### Template Generation
+---
 ---
 ```bash
 # Generate _templ.go files
@@ -346,18 +503,18 @@ templ generate
 templ generate --watch
 ```
 ---
-
 ## 📊 Monitoring & Logging
 
 ### Structured Logging
+---
 ---
 ```go
 log.Printf("CartAdd: error adding item: %v", err)
 log.Printf("Checkout error (unhandled): %T - %v", err, err)
 ```
 ---
-
 ### Request Tracking
+---
 ---
 ```json
 {
@@ -373,22 +530,34 @@ log.Printf("Checkout error (unhandled): %T - %v", err, err)
 }
 ```
 ---
-
 ## 🐛 Known Issues & TODOs
 
-### In Progress
-- [ ] Product images (product_images table missing)
-- [ ] Order payment integration
-- [ ] Order refund flow
-- [ ] Email notifications
+### Recent Improvements ✅
+- [x] Component-based product cards (StandardProductCard, SaleProductCard)
+- [x] Accessibility enhancements (ARIA labels, SR-only headings, dialog roles)
+- [x] Image performance optimization (lazy-loading, async decoding)
+- [x] Out-of-stock handling in product cards
+- [x] English UI translations
+- [x] Product images table and storage system
+- [x] Email notification system (outbox pattern with worker)
+- [x] PDF invoice generation
+- [x] Payment integration (with mock provider)
+- [x] Refund service and webhook handling
+
+### In Progress / Needs Migration
+- [ ] Refund fields in orders table (RefundedCents, RefundedAt - currently in Go struct only)
+- [ ] Email worker deployment configuration
+- [ ] Payment provider production credentials
 
 ### Future Enhancements
 - [ ] Product search & filtering
 - [ ] Wishlist functionality
 - [ ] Customer reviews
 - [ ] Multi-currency support
-- [ ] Shipping integrations
-- [ ] Invoice generation
+- [ ] Real payment provider integration (Stripe, PayPal)
+- [ ] Shipping provider integrations
+- [ ] Advanced email templates
+- [ ] SMS notifications
 
 ## 🤝 Contributing
 

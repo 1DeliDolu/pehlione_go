@@ -7,10 +7,19 @@ import (
 )
 
 type ProductsIndexVM struct {
-	Title      string
-	AlertError string
-	CSRFToken  string
-	Products   []ProductCardVM
+	Title          string
+	AlertError     string
+	CSRFToken      string
+	Products       []ProductCardVM
+	CategoryGroups []ProductGroupVM
+	SaleProducts   []ProductCardVM
+}
+
+type ProductGroupVM struct {
+	Name        string
+	Slug        string
+	Description string
+	Products    []ProductCardVM
 }
 
 type ProductCardVM struct {
@@ -23,59 +32,214 @@ type ProductCardVM struct {
 	DefaultVariantID string
 }
 
+templ StandardProductCard(p ProductCardVM, csrf string) {
+	<div class="group flex flex-col rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+		<a href={ fmt.Sprintf("/products/%s", p.Slug) } class="relative block overflow-hidden rounded-lg bg-gray-100">
+			if p.ImageURL != "" {
+				<img src={ p.ImageURL } alt={ p.Title } loading="lazy" decoding="async" class="aspect-square w-full object-cover transition group-hover:scale-105"/>
+			} else {
+				<div class="aspect-square w-full bg-gray-100"></div>
+			}
+		</a>
+		<div class="mt-4 flex flex-1 flex-col">
+			<h4 class="text-sm font-semibold text-gray-900">
+				<a href={ fmt.Sprintf("/products/%s", p.Slug) } class="hover:text-indigo-600">{ p.Title }</a>
+			</h4>
+			if p.Subtitle != "" {
+				<p class="mt-1 text-xs text-gray-500">{ p.Subtitle }</p>
+			}
+			<p class="mt-2 text-base font-bold text-gray-900">{ shared.FormatMoney(p.Currency, p.PriceCents) }</p>
+
+			if p.DefaultVariantID == "" {
+				<button type="button" disabled class="mt-4 w-full cursor-not-allowed rounded-lg bg-gray-300 px-3 py-2 text-sm font-medium text-gray-700">
+					Out of stock
+				</button>
+			} else {
+				<form method="POST" action="/cart/items" class="mt-4">
+					if csrf != "" {
+						<input type="hidden" name="csrf_token" value={ csrf }/>
+					}
+					<input type="hidden" name="variant_id" value={ p.DefaultVariantID }/>
+					<input type="hidden" name="qty" value="1"/>
+					<button type="submit" class="w-full rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+						Add to cart
+					</button>
+				</form>
+			}
+		</div>
+	</div>
+}
+
+templ SaleProductCard(p ProductCardVM, csrf string) {
+	<div class="group flex flex-col rounded-xl border border-rose-100 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+		<a href={ fmt.Sprintf("/products/%s", p.Slug) } class="relative block overflow-hidden rounded-lg bg-rose-50">
+			if p.ImageURL != "" {
+				<img src={ p.ImageURL } alt={ p.Title } loading="lazy" decoding="async" class="aspect-square w-full object-cover transition group-hover:scale-105"/>
+			} else {
+				<div class="aspect-square w-full bg-rose-50"></div>
+			}
+			<span class="absolute left-3 top-3 rounded-full bg-rose-600 px-3 py-1 text-xs font-semibold text-white">Sale</span>
+		</a>
+		<div class="mt-4 flex flex-1 flex-col">
+			<h4 class="text-sm font-semibold text-gray-900">
+				<a href={ fmt.Sprintf("/products/%s", p.Slug) } class="hover:text-rose-600">{ p.Title }</a>
+			</h4>
+			<p class="mt-2 text-base font-bold text-gray-900">{ shared.FormatMoney(p.Currency, p.PriceCents) }</p>
+
+			if p.DefaultVariantID == "" {
+				<button type="button" disabled class="mt-4 w-full cursor-not-allowed rounded-lg bg-gray-300 px-3 py-2 text-sm font-medium text-gray-700">
+					Out of stock
+				</button>
+			} else {
+				<form method="POST" action="/cart/items" class="mt-4">
+					if csrf != "" {
+						<input type="hidden" name="csrf_token" value={ csrf }/>
+					}
+					<input type="hidden" name="variant_id" value={ p.DefaultVariantID }/>
+					<input type="hidden" name="qty" value="1"/>
+					<button type="submit" class="w-full rounded-lg bg-rose-600 px-3 py-2 text-sm font-medium text-white hover:bg-rose-500 focus:outline-hidden focus:ring-2 focus:ring-rose-500 focus:ring-offset-2">
+						Add to cart
+					</button>
+				</form>
+			}
+		</div>
+	</div>
+}
+
 templ ProductsIndexPage(vm ProductsIndexVM) {
 	@shared.Base(shared.BaseVM{Title: vm.Title}) {
 		<div class="bg-white">
-			<div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-				<div class="flex items-end justify-between gap-4">
-					<h2 class="text-2xl font-bold tracking-tight text-gray-900">Ürünler</h2>
-					<a href="/cart" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Sepete git</a>
-				</div>
-
-				if vm.AlertError != "" {
-					<div class="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-						{ vm.AlertError }
+			<div class="border-b border-gray-100 bg-gradient-to-b from-white to-gray-50">
+				<div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-4 py-8 sm:flex-row sm:items-center sm:px-6 lg:px-8">
+					<div>
+						<p class="text-sm font-semibold uppercase tracking-wide text-indigo-600">pehliONE Collections</p>
+						<h1 class="text-3xl font-bold text-gray-900">Browse by Category</h1>
+						<p class="mt-2 text-sm text-gray-500">Three curated picks from each category. Use filters to quickly find what you&rsquo;re looking for.</p>
 					</div>
-				}
-
-				<div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-					for _, p := range vm.Products {
-						<div class="group relative">
-							<a href={ fmt.Sprintf("/products/%s", p.Slug) }>
-								if p.ImageURL != "" {
-									<img src={ p.ImageURL } alt={ p.Title } class="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"/>
-								} else {
-									<div class="aspect-square w-full rounded-md bg-gray-100 lg:h-80"></div>
-								}
-							</a>
-
-							<div class="mt-4 flex justify-between gap-4">
-								<div>
-									<h3 class="text-sm text-gray-700">
-										<a href={ fmt.Sprintf("/products/%s", p.Slug) }>
-											<span aria-hidden="true" class="absolute inset-0"></span>
-											{ p.Title }
-										</a>
-									</h3>
-									<p class="mt-1 text-sm text-gray-500">{ p.Subtitle }</p>
-								</div>
-								<p class="text-sm font-medium text-gray-900">{ shared.FormatMoney(p.Currency, p.PriceCents) }</p>
-							</div>
-
-							<form method="POST" action="/cart/items" class="mt-4">
-								if vm.CSRFToken != "" {
-									<input type="hidden" name="csrf_token" value={ vm.CSRFToken }/>
-								}
-								<input type="hidden" name="variant_id" value={ p.DefaultVariantID }/>
-								<input type="hidden" name="qty" value="1"/>
-								<button type="submit" class="w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-									Sepete ekle
-								</button>
-							</form>
-						</div>
-					}
+					<a href="/cart" class="inline-flex items-center rounded-full border border-indigo-100 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50">
+						Go to cart
+					</a>
 				</div>
 			</div>
+
+			<main class="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+				<section aria-labelledby="products-heading" class="pt-12">
+					<h2 id="products-heading" class="sr-only">Products</h2>
+
+					<div class="border-b border-gray-200 pb-4">
+						<div class="flex items-center gap-3 text-sm text-gray-500">
+							<span>Filters:</span>
+							<button type="button" command="show-modal" commandfor="mobile-filters" class="rounded-full border border-gray-200 px-3 py-1 text-gray-700 hover:border-gray-300 hover:text-gray-900 lg:hidden">
+								Categories
+							</button>
+						</div>
+					</div>
+
+					<div class="pt-6 lg:grid lg:grid-cols-4 lg:gap-8">
+						<div class="hidden lg:block">
+							<nav class="space-y-6">
+								<div>
+									<h3 class="text-sm font-semibold text-gray-900">Categories</h3>
+									<ul class="mt-4 space-y-2 text-sm text-gray-600">
+										for _, g := range vm.CategoryGroups {
+											<li>
+												<a href={ fmt.Sprintf("#%s", g.Slug) } class="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50 hover:text-gray-900">
+													<span>{ g.Name }</span>
+													<span class="text-gray-400">{ len(g.Products) }</span>
+												</a>
+											</li>
+										}
+									</ul>
+								</div>
+							</nav>
+						</div>
+
+						<div class="lg:col-span-3">
+							if vm.AlertError != "" {
+								<div class="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+									{ vm.AlertError }
+								</div>
+							}
+
+							if len(vm.SaleProducts) > 0 {
+								<section id="sale" class="space-y-4 border-b border-gray-100 py-8">
+									<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+										<div>
+											<p class="text-xs font-semibold uppercase tracking-wide text-rose-500">Promotions</p>
+											<h3 class="text-xl font-bold text-gray-900">On-sale Products</h3>
+											<p class="text-sm text-gray-500">Don&rsquo;t miss special prices.</p>
+										</div>
+										<a href="/products?filter=sale" class="text-sm font-medium text-rose-600 hover:text-rose-500">
+											View all sales
+										</a>
+									</div>
+									<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+										for _, p := range vm.SaleProducts {
+											@SaleProductCard(p, vm.CSRFToken)
+										}
+									</div>
+								</section>
+							}
+
+							if len(vm.CategoryGroups) == 0 {
+								<p class="text-sm text-gray-500">No products yet.</p>
+							} else {
+								for _, g := range vm.CategoryGroups {
+									<section id={ g.Slug } class="space-y-4 border-b border-gray-100 py-8 last:border-none">
+										<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+											<div>
+												<p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Category</p>
+												<h3 class="text-xl font-bold text-gray-900">{ g.Name }</h3>
+												if g.Description != "" {
+													<p class="text-sm text-gray-500">{ g.Description }</p>
+												}
+											</div>
+											<a href={ fmt.Sprintf("/products?category=%s", g.Slug) } class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+												View all
+											</a>
+										</div>
+
+										<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+											for _, p := range g.Products {
+												@StandardProductCard(p, vm.CSRFToken)
+											}
+										</div>
+									</section>
+								}
+							}
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<el-dialog>
+				<dialog id="mobile-filters" class="overflow-hidden backdrop:bg-transparent lg:hidden" aria-modal="true" aria-labelledby="mobile-filters-heading">
+					<el-dialog-backdrop class="fixed inset-0 bg-black/25 transition-opacity duration-300 ease-linear data-closed:opacity-0"></el-dialog-backdrop>
+					<div tabindex="0" class="fixed inset-0 flex focus:outline-none">
+						<el-dialog-panel class="relative ml-auto flex size-full max-w-xs transform flex-col overflow-y-auto bg-white pt-4 pb-6 shadow-xl transition duration-300 ease-in-out data-closed:translate-x-full">
+							<div class="flex items-center justify-between px-4">
+								<h2 id="mobile-filters-heading" class="text-lg font-medium text-gray-900">Categories</h2>
+								<button type="button" command="close" commandfor="mobile-filters" class="relative -mr-2 flex size-10 items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden">
+									<span class="absolute -inset-0.5"></span>
+									<span class="sr-only">Close</span>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="size-6">
+										<path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+									</svg>
+								</button>
+							</div>
+							<ul role="list" class="mt-6 space-y-2 px-4 pb-6 text-sm font-medium text-gray-900">
+								for _, g := range vm.CategoryGroups {
+									<li>
+										<a href={ fmt.Sprintf("#%s", g.Slug) } command="close" commandfor="mobile-filters" class="block rounded-md px-3 py-2 hover:bg-gray-50">
+											{ g.Name }
+										</a>
+									</li>
+								}
+							</ul>
+						</el-dialog-panel>
+					</div>
+				</dialog>
+			</el-dialog>
 		</div>
 	}
 }

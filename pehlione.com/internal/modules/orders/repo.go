@@ -11,6 +11,9 @@ type Repo struct{ db *gorm.DB }
 
 func NewRepo(db *gorm.DB) *Repo { return &Repo{db: db} }
 
+// DB returns the underlying database connection for direct queries.
+func (r *Repo) DB() *gorm.DB { return r.db }
+
 type ListByUserParams struct {
 	UserID   string
 	Page     int

@@ -6,8 +6,20 @@ templ FlashBanner(f *view.Flash) {
 	if f == nil {
 		// nothing
 	} else {
-		<div class="mb-4 p-3 border rounded">
-			<strong class="mr-2">{ string(f.Kind) }</strong>
+		<div class="mb-4 rounded border p-3">
+			<strong class="mr-2">
+				if string(f.Kind) == "error" {
+					Error:
+				} else if string(f.Kind) == "success" {
+					Success:
+				} else if string(f.Kind) == "warning" {
+					Warning:
+				} else if string(f.Kind) == "info" {
+					Info:
+				} else {
+					{ string(f.Kind) }:
+				}
+			</strong>
 			<span>{ f.Message }</span>
 		</div>
 	}

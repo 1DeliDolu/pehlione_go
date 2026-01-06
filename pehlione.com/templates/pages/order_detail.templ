@@ -10,20 +10,21 @@ templ OrderDetail(flash *view.Flash, o view.OrderDetail) {
 }
 
 templ OrderDetailBody(o view.OrderDetail) {
-	<h1 class="text-2xl font-semibold mb-2">Sipariş</h1>
+	<h1 class="mb-2 text-2xl font-semibold">Order</h1>
+
 	<div class="mb-4">
 		<div><strong>ID:</strong> { o.ID }</div>
 		<div><strong>Status:</strong> { o.Status }</div>
 	</div>
 
-	<table class="w-full border-collapse mb-4">
+	<table class="mb-4 w-full border-collapse">
 		<thead>
 			<tr class="border-b">
-				<th class="text-left p-2">Ürün</th>
-				<th class="text-left p-2">SKU</th>
-				<th class="text-left p-2">Adet</th>
-				<th class="text-left p-2">Birim</th>
-				<th class="text-left p-2">Toplam</th>
+				<th class="p-2 text-left">Product</th>
+				<th class="p-2 text-left">SKU</th>
+				<th class="p-2 text-left">Quantity</th>
+				<th class="p-2 text-left">Unit price</th>
+				<th class="p-2 text-left">Total</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -32,7 +33,7 @@ templ OrderDetailBody(o view.OrderDetail) {
 					<td class="p-2">
 						{ it.ProductName }
 						if it.Options != "" {
-							<div class="text-sm mt-1"><code>{ it.Options }</code></div>
+							<div class="mt-1 text-sm"><code>{ it.Options }</code></div>
 						}
 					</td>
 					<td class="p-2">{ it.SKU }</td>
@@ -44,7 +45,7 @@ templ OrderDetailBody(o view.OrderDetail) {
 		</tbody>
 	</table>
 
-	<div class="border rounded p-3">
+	<div class="rounded border p-3">
 		<div><strong>Subtotal:</strong> { o.Subtotal }</div>
 		<div><strong>Shipping:</strong> { o.Shipping }</div>
 		<div><strong>Tax:</strong> { o.Tax }</div>
@@ -54,11 +55,11 @@ templ OrderDetailBody(o view.OrderDetail) {
 
 	if o.Status == "created" {
 		<div class="mt-3">
-			<a class="underline" href={ "/orders/" + o.ID + "/pay" }>Ödeme Yap</a>
+			<a class="underline" href={ "/orders/" + o.ID + "/pay" }>Pay now</a>
 		</div>
 	}
 
 	<div class="mt-6">
-		<a class="underline" href="/products">Alışverişe devam</a>
+		<a class="underline" href="/products">Continue shopping</a>
 	</div>
 }

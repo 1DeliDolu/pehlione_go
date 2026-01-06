@@ -84,6 +84,90 @@ func (h *CartHandler) Add(c *gin.Context) {
 	render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashSuccess, "✓ Sepete eklendi.")
 }
 
+// Update handles POST /cart/items/update - updates item quantity
+func (h *CartHandler) Update(c *gin.Context) {
+	variantID := strings.TrimSpace(c.PostForm("variant_id"))
+	qtyStr := strings.TrimSpace(c.PostForm("qty"))
+	qty := 1
+	if qtyStr != "" {
+		if n, err := strconv.Atoi(qtyStr); err == nil {
+			qty = n
+		}
+	}
+
+	if variantID == "" {
+		render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Ürün bulunamadı.")
+		return
+	}
+
+	qty = clamp(qty, 0, 99)
+
+	if u, ok := middleware.CurrentUser(c); ok && u.ID != "" {
+		repo := cart.NewRepo(h.DB)
+		userCart, err := repo.GetOrCreateUserCart(c.Request.Context(), u.ID)
+		if err != nil {
+			log.Printf("CartUpdate: error getting cart: %v", err)
+			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Sepet güncellenemedi.")
+			return
+		}
+
+		if err := repo.UpdateItemQty(c.Request.Context(), userCart.ID, variantID, qty); err != nil {
+			log.Printf("CartUpdate: update item error: %v", err)
+			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Miktar güncellenemedi.")
+			return
+		}
+
+		middleware.ClearSessionCartCache(c)
+		render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashSuccess, "Miktar güncellendi.")
+		return
+	}
+
+	cc, _ := h.CK.Get(c)
+	if cc == nil {
+		cc = &cartcookie.Cart{}
+	}
+	cc.UpdateQuantity(variantID, qty)
+	h.CK.Set(c, cc)
+	render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashSuccess, "Miktar güncellendi.")
+}
+
+// Remove handles POST /cart/items/remove - removes item from cart
+func (h *CartHandler) Remove(c *gin.Context) {
+	variantID := strings.TrimSpace(c.PostForm("variant_id"))
+	if variantID == "" {
+		render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashWarning, "Ürün bulunamadı.")
+		return
+	}
+
+	if u, ok := middleware.CurrentUser(c); ok && u.ID != "" {
+		repo := cart.NewRepo(h.DB)
+		userCart, err := repo.GetOrCreateUserCart(c.Request.Context(), u.ID)
+		if err != nil {
+			log.Printf("CartRemove: error getting cart: %v", err)
+			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Sepet güncellenemedi.")
+			return
+		}
+
+		if err := repo.RemoveItem(c.Request.Context(), userCart.ID, variantID); err != nil {
+			log.Printf("CartRemove: remove item error: %v", err)
+			render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashError, "Ürün silinemedi.")
+			return
+		}
+
+		middleware.ClearSessionCartCache(c)
+		render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashSuccess, "Ürün sepetten çıkarıldı.")
+		return
+	}
+
+	cc, _ := h.CK.Get(c)
+	if cc == nil {
+		cc = &cartcookie.Cart{}
+	}
+	cc.RemoveItem(variantID)
+	h.CK.Set(c, cc)
+	render.RedirectWithFlash(c, h.Flash, "/cart", view.FlashSuccess, "Ürün sepetten çıkarıldı.")
+}
+
 // Get handles GET /cart - displays cart page
 func (h *CartHandler) Get(c *gin.Context) {
 	flash := middleware.GetFlash(c)
@@ -98,7 +182,7 @@ func (h *CartHandler) Get(c *gin.Context) {
 			render.Component(c, http.StatusOK, pages.Cart(flash, view.CartPage{Items: []view.CartItem{}}))
 			return
 		}
-
+		cartPage.CSRFToken = csrfTokenFrom(c)
 		render.Component(c, http.StatusOK, pages.Cart(flash, cartPage))
 		return
 	}
@@ -111,6 +195,17 @@ func (h *CartHandler) Get(c *gin.Context) {
 		render.Component(c, http.StatusOK, pages.Cart(flash, view.CartPage{Items: []view.CartItem{}}))
 		return
 	}
+	cartPage.CSRFToken = csrfTokenFrom(c)
 
 	render.Component(c, http.StatusOK, pages.Cart(flash, cartPage))
+}
+
+func clamp(val, min, max int) int {
+	if val < min {
+		return min
+	}
+	if val > max {
+		return max
+	}
+	return val
 }

@@ -63,7 +63,7 @@ func AdminProductsListBody(csrf string, items []view.AdminProductListItem) templ
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"text-2xl font-semibold mb-4\">Ürünler</h1><div class=\"mb-4\"><a class=\"underline\" href=\"/admin/products/new\">Yeni Ürün</a></div><table class=\"w-full border-collapse\"><thead><tr class=\"border-b\"><th class=\"text-left p-2\">Name</th><th class=\"text-left p-2\">Slug</th><th class=\"text-left p-2\">Status</th><th class=\"text-left p-2\">Actions</th></tr></thead> <tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1 class=\"mb-4 text-2xl font-semibold\">Products</h1><div class=\"mb-4\"><a class=\"underline\" href=\"/admin/products/new\">New product</a></div><table class=\"w-full border-collapse\"><thead><tr class=\"border-b\"><th class=\"p-2 text-left\">Name</th><th class=\"p-2 text-left\">Slug</th><th class=\"p-2 text-left\">Status</th><th class=\"p-2 text-left\">Actions</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,7 +75,7 @@ func AdminProductsListBody(csrf string, items []view.AdminProductListItem) templ
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 31, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 31, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -88,7 +88,7 @@ func AdminProductsListBody(csrf string, items []view.AdminProductListItem) templ
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(p.Slug)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 32, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 32, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -101,20 +101,20 @@ func AdminProductsListBody(csrf string, items []view.AdminProductListItem) templ
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 33, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 33, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</td><td class=\"p-2\"><a class=\"underline mr-3\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</td><td class=\"p-2\"><a class=\"mr-3 underline\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 templ.SafeURL
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/edit")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 35, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 35, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -127,7 +127,7 @@ func AdminProductsListBody(csrf string, items []view.AdminProductListItem) templ
 			var templ_7745c5c3_Var7 templ.SafeURL
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs("/admin/products/" + p.ID + "/delete")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 36, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 36, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -140,7 +140,7 @@ func AdminProductsListBody(csrf string, items []view.AdminProductListItem) templ
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 37, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/pages/admin_products_list.templ`, Line: 37, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {

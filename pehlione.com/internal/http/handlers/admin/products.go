@@ -31,7 +31,12 @@ type ProductsHandler struct {
 }
 
 func NewProductsHandler(db *gorm.DB, fl *flash.Codec, st storage.Storage) *ProductsHandler {
-	return &ProductsHandler{DB: db, Flash: fl, Store: st, AllowSKUChange: os.Getenv("ALLOW_VARIANT_SKU_CHANGE") == "true"}
+	val := strings.ToLower(strings.TrimSpace(os.Getenv("ALLOW_VARIANT_SKU_CHANGE")))
+	allow := true
+	if val == "false" || val == "0" || val == "off" {
+		allow = false
+	}
+	return &ProductsHandler{DB: db, Flash: fl, Store: st, AllowSKUChange: allow}
 }
 
 // ---------- List ----------

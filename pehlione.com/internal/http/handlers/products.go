@@ -11,6 +11,7 @@ import (
 
 	"pehlione.com/app/internal/http/render"
 	"pehlione.com/app/internal/modules/products"
+	"pehlione.com/app/internal/shared/slug"
 	pages "pehlione.com/app/templates/pages/products"
 )
 
@@ -64,10 +65,13 @@ func (h *ProductsHandler) List(c *gin.Context) {
 		return
 	}
 
+	groups := groupProductsByCategory(prods)
+
 	vm := pages.ProductsIndexVM{
-		Title:     "Ürünler",
-		Products:  mapProductsForList(prods),
-		CSRFToken: csrfTokenFrom(c),
+		Title:          "Ürünler",
+		Products:       mapProductsForList(prods),
+		CategoryGroups: groups,
+		CSRFToken:      csrfTokenFrom(c),
 	}
 	render.Component(c, http.StatusOK, pages.ProductsIndexPage(vm))
 }
@@ -126,31 +130,83 @@ func csrfTokenFrom(c *gin.Context) string {
 func mapProductsForList(items []products.Product) []pages.ProductCardVM {
 	out := make([]pages.ProductCardVM, 0, len(items))
 	for _, p := range items {
-		img := ""
-		if len(p.Images) > 0 {
-			img = p.Images[0].URL
-		}
-
-		// Fiyat: ilk varyantten al
-		price := int64(0)
-		defaultVariantID := ""
-
-		if len(p.Variants) > 0 {
-			price = int64(p.Variants[0].PriceCents)
-			defaultVariantID = p.Variants[0].ID
-		}
-
-		out = append(out, pages.ProductCardVM{
-			Title:            p.Name,
-			Slug:             p.Slug,
-			ImageURL:         img,
-			PriceCents:       price,
-			Currency:         "EUR",
-			DefaultVariantID: defaultVariantID,
-			Subtitle:         "",
-		})
+		out = append(out, productCardFromModel(p))
 	}
 	return out
+}
+
+func groupProductsByCategory(items []products.Product) []pages.ProductGroupVM {
+	groupsBySlug := map[string]*pages.ProductGroupVM{}
+	order := make([]string, 0)
+	for _, p := range items {
+		name, tagline := parseCategoryFromDescription(p.Description)
+		catSlug := slug.FromName(strings.ToLower(name))
+		if catSlug == "" {
+			catSlug = slug.FromName("tüm ürünler")
+		}
+		group, ok := groupsBySlug[catSlug]
+		if !ok {
+			group = &pages.ProductGroupVM{
+				Name:        name,
+				Slug:        catSlug,
+				Description: tagline,
+				Products:    []pages.ProductCardVM{},
+			}
+			groupsBySlug[catSlug] = group
+			order = append(order, catSlug)
+		}
+		if len(group.Products) < 3 {
+			group.Products = append(group.Products, productCardFromModel(p))
+		}
+	}
+
+	out := make([]pages.ProductGroupVM, 0, len(order))
+	for _, slugKey := range order {
+		out = append(out, *groupsBySlug[slugKey])
+	}
+	return out
+}
+
+func parseCategoryFromDescription(desc string) (string, string) {
+	desc = strings.TrimSpace(desc)
+	if strings.HasPrefix(strings.ToLower(desc), "category:") {
+		body := strings.TrimSpace(desc[len("category:"):])
+		parts := strings.SplitN(body, "|", 2)
+		name := strings.TrimSpace(parts[0])
+		if name == "" {
+			name = "Tüm Ürünler"
+		}
+		tagline := ""
+		if len(parts) > 1 {
+			tagline = strings.TrimSpace(parts[1])
+		}
+		return name, tagline
+	}
+	return "Tüm Ürünler", desc
+}
+
+func productCardFromModel(p products.Product) pages.ProductCardVM {
+	img := ""
+	if len(p.Images) > 0 {
+		img = p.Images[0].URL
+	}
+
+	price := int64(0)
+	defaultVariantID := ""
+	if len(p.Variants) > 0 {
+		price = int64(p.Variants[0].PriceCents)
+		defaultVariantID = p.Variants[0].ID
+	}
+
+	return pages.ProductCardVM{
+		Title:            p.Name,
+		Slug:             p.Slug,
+		ImageURL:         img,
+		PriceCents:       price,
+		Currency:         "EUR",
+		DefaultVariantID: defaultVariantID,
+		Subtitle:         "",
+	}
 }
 
 func mapProductForDetail(p products.Product) pages.ProductDetailVM {
